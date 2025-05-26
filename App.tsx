@@ -13,7 +13,7 @@ const sampleTimelineData: TimelineEventData[] = [
     title: 'My First Steps with a Vivo Phone',
     category: 'Mobile Photography',
     description: 'Exploring the world of photography using just my Vivo smartphone. Learning composition, lighting, and capturing everyday moments. This phase was all about experimentation and finding my eye.',
-    eventProfileImageUrl: 'https://picsum.photos/seed/me_vivo/100/100',
+    eventProfileImageUrl: 'https://i.postimg.cc/zvndDjGJ/DSC-1129.jpg',
     media: [
       { type: MediaType.Image, src: 'https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', altText: 'Early Vivo shot - Landscape', description: 'A misty morning landscape captured with Vivo.' },
       { type: MediaType.Image, src: 'Images/one.jpg', altText: 'Early Vivo shot - Macro', description: 'Close-up of a flower, exploring macro.' },
