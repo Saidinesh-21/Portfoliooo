@@ -1,0 +1,43 @@
+import React from 'react';
+import { TimelineEventData } from '../types';
+import TimelineCard from './TimelineCard';
+
+interface TimelineProps {
+  events: TimelineEventData[];
+}
+
+const Timeline: React.FC<TimelineProps> = ({ events }) => {
+  if (!events || events.length === 0) {
+    return <p className="text-center text-[#c9ada7] py-10 font-['Roboto Mono']">No events to display.</p>; /* pale-dogwood for text on dark bg */
+  }
+
+  const linePositionPx = 20; 
+  const contentMarginFromLinePx = 20;
+
+  return (
+    <div className="container mx-auto px-4 py-8 sm:py-12"> {/* Removed light background, will inherit page dark background */}
+      <div className="relative"> 
+        <div
+          className="absolute w-1 bg-[#9a8c98] top-0 bottom-0 rounded-full" /* rose-quartz line for contrast on dark bg */
+          style={{ left: `${linePositionPx}px` }}
+          aria-hidden="true"
+        ></div>
+
+        <div 
+          className="space-y-10"
+          style={{ marginLeft: `${linePositionPx + contentMarginFromLinePx}px` }}
+        >
+          {events.map((event) => (
+            <TimelineCard
+              key={event.id}
+              event={event}
+              dotOffsetFromCardEdgePx={contentMarginFromLinePx} 
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Timeline;
