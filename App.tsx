@@ -15,7 +15,7 @@ const sampleTimelineData: TimelineEventData[] = [
     description: 'Exploring the world of photography using just my Vivo smartphone. Learning composition, lighting, and capturing everyday moments. This phase was all about experimentation and finding my eye.',
     eventProfileImageUrl: 'https://i.postimg.cc/zvndDjGJ/DSC-1129.jpg',
     media: [
-      { type: MediaType.Image, src: 'https://i.postimg.cc/zvndDjGJ/DSC-1129.jpg', altText: 'Early Vivo shot - Landscape', description: 'A misty morning landscape captured with Vivo.' },
+      { type: MediaType.Image, src: 'https://i.postimg.cc/d3dfkF4c/BIRD-FINAL.jpg', altText: 'Early Vivo shot - Landscape', description: 'A misty morning landscape captured with Vivo.' },
       { type: MediaType.Image, src: 'Images/one.jpg', altText: 'Early Vivo shot - Macro', description: 'Close-up of a flower, exploring macro.' },
       { type: MediaType.Image, src: 'https://picsum.photos/seed/vivo_pic3/800/600', altText: 'Early Vivo shot - Portrait', description: 'An early attempt at a street portrait.' },
     ],
