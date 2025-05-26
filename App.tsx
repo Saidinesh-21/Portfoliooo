@@ -112,7 +112,8 @@ const App: React.FC = () => {
           name="Vamshi Mailaram"
           professionalSummary="Passionate visual storyteller, capturing moments and crafting narratives through photography and videography."
           profileImageUrl="https://picsum.photos/seed/vamshi_profile/200/200"
-          backgroundImageUrl="Saidinesh-21/Portfoliooo/Images/Background.jpg" 
+          backgroundImageUrl="/images/Background.jpg"
+
         />
         <Timeline events={sampleTimelineData} />
       </main>
