@@ -234,7 +234,7 @@ const App: React.FC = () => {
   return (
     <div
       className="min-h-screen flex flex-col bg-gradient-to-b from-white via-gray-100 to-white text-black"
-      style={{ fontFamily: "'Roboto Mono', monospace", filter: 'none' }}
+      style={{ fontFamily: "'Roboto Mono', monospace", filter: 'none !important' }}
     >
       <Header />
       <main className="flex-grow">
