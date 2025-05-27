@@ -111,7 +111,7 @@ const App: React.FC = () => {
     <HeroSection
       name="Vamshi Mailaram"
       professionalSummary="Passionate visual storyteller, capturing moments and crafting narratives through photography and videography."
-      profileImageUrl="https://i.postimg.cc/mZ5sCwt2/IMG-5147-Original-Original.jpg"
+      profileImageUrl="https://i.postimg.cc/0yVkXJfV/Vamsiiiiii-dpp.jpg"
       backgroundImageUrl="https://i.postimg.cc/1zGmKNb7/IMG-7447-2-Original-Original.jpg"
       profileImageClass="object-contain w-full h-full rounded-full"
       backgroundImageClass="bg-contain bg-center bg-no-repeat"
