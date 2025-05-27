@@ -231,11 +231,15 @@ const sampleTimelineData: TimelineEventData[] = [
 
 const App: React.FC = () => {
   useEffect(() => {
+    // Remove any grayscale or unwanted filters
     document.body.style.filter = 'none';
+    document.documentElement.style.filter = 'none';
+  }, []);
+
   return (
     <div
       className="min-h-screen flex flex-col bg-gradient-to-b from-white via-gray-100 to-white text-black"
-      style={{ fontFamily: "'Roboto Mono', monospace", filter: 'none !important' }}
+      style={{ fontFamily: "'Roboto Mono', monospace" }}
     >
       <Header />
       <main className="flex-grow">
