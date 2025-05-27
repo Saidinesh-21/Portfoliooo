@@ -1,3 +1,4 @@
+import React from 'react';
 import React, { useEffect } from 'react';
 import { TimelineEventData, MediaType } from './types';
 import Header from './components/Header';
