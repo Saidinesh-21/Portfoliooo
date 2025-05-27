@@ -246,7 +246,7 @@ const App: React.FC = () => {
         />
         <Timeline events={sampleTimelineData} />
       </main>
-      <footer className="text-center py-8 text-gray-300 text-sm font-['Roboto Mono'] bg-gray-900">
+      <footer className="text-center py-8 text-gray-300 text-sm font-['Roboto Mono'] bg-transparent backdrop-blur-md shadow-none">
         <p>&copy; {new Date().getFullYear()} Vamshi Mailaram. All rights reserved.</p>
         <p>Built with React, TypeScript, and Tailwind CSS.</p>
       </footer>
