@@ -15,8 +15,8 @@ const sampleTimelineData: TimelineEventData[] = [
     description: 'Exploring the world of photography using just my Vivo smartphone. Learning composition, lighting, and capturing everyday moments. This phase was all about experimentation and finding my eye.',
     eventProfileImageUrl: 'https://i.postimg.cc/zvndDjGJ/DSC-1129.jpg',
     media: [
-      { type: MediaType.Image, src: 'https://i.postimg.cc/d3dfkF4c/BIRD-FINAL.jpg', altText: 'Early Vivo shot - Landscape', description: 'A misty morning landscape captured with Vivo.' },
-      { type: MediaType.Image, src: 'Images/one.jpg', altText: 'Early Vivo shot - Macro', description: 'Close-up of a flower, exploring macro.' },
+      { type: MediaType.Image, src: 'https://i.postimg.cc/j2zmpzQB/IMG-20190604-182315-01-01-Original.jpg', altText: 'Early Vivo shot - Landscape', description: 'A misty morning landscape captured with Vivo.' },
+      { type: MediaType.Image, src: 'https://i.postimg.cc/J0qK3KQ7/IMG-20200208-174105-Original-2.jpg', altText: 'Early Vivo shot - Macro', description: 'Close-up of a flower, exploring macro.' },
       { type: MediaType.Image, src: 'https://picsum.photos/seed/vivo_pic3/800/600', altText: 'Early Vivo shot - Portrait', description: 'An early attempt at a street portrait.' },
     ],
   },
@@ -106,22 +106,23 @@ const sampleTimelineData: TimelineEventData[] = [
 const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#22223b] text-[#f0efeb]"> {/* space-cadet bg, isabelline text */}
-      <Header />
-      <main className="flex-grow">
-        <HeroSection
-          name="Vamshi Mailaram"
-          professionalSummary="Passionate visual storyteller, capturing moments and crafting narratives through photography and videography."
-          profileImageUrl="https://i.postimg.cc/mZ5sCwt2/IMG-5147-Original-Original.jpg"
-          backgroundImageUrl="https://i.postimg.cc/1zGmKNb7/IMG-7447-2-Original-Original.jpg"
-
-        />
-        <Timeline events={sampleTimelineData} />
-      </main>
-      <footer className="text-center py-8 text-[#f0efeb] text-sm font-['Roboto Mono'] bg-[#181828]"> {/* pale-dogwood text, darker space-cadet bg for footer */}
-        <p>&copy; {new Date().getFullYear()} Vamshi Mailaram. All rights reserved.</p>
-        <p>Built with React, TypeScript, and Tailwind CSS.</p>
-      </footer>
-    </div>
+  <Header />
+  <main className="flex-grow">
+    <HeroSection
+      name="Vamshi Mailaram"
+      professionalSummary="Passionate visual storyteller, capturing moments and crafting narratives through photography and videography."
+      profileImageUrl="https://i.postimg.cc/mZ5sCwt2/IMG-5147-Original-Original.jpg"
+      backgroundImageUrl="https://i.postimg.cc/1zGmKNb7/IMG-7447-2-Original-Original.jpg"
+      profileImageClass="object-contain w-full h-full rounded-full"
+      backgroundImageClass="bg-contain bg-center bg-no-repeat"
+    />
+    <Timeline events={sampleTimelineData} />
+  </main>
+  <footer className="text-center py-8 text-[#f0efeb] text-sm font-['Roboto Mono'] bg-[#181828]"> {/* pale-dogwood text, darker space-cadet bg for footer */}
+    <p>&copy; {new Date().getFullYear()} Vamshi Mailaram. All rights reserved.</p>
+    <p>Built with React, TypeScript, and Tailwind CSS.</p>
+  </footer>
+</div>
   );
 };
 
