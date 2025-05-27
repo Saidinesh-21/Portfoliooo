@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TimelineEventData, MediaType } from './types';
 import Header from './components/Header';
 import Timeline from './components/Timeline';
@@ -229,6 +229,8 @@ const sampleTimelineData: TimelineEventData[] = [
 ];
 
 const App: React.FC = () => {
+  useEffect(() => {
+    document.body.style.filter = 'none';
   return (
     <div
       className="min-h-screen flex flex-col bg-gradient-to-b from-white via-gray-100 to-white text-black"
