@@ -1,12 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface HeroSectionProps {
   name: string;
   professionalSummary: string;
   profileImageUrl: string;
   backgroundImageUrl: string;
-  profileImageClass?: string;
-  backgroundImageClass?: string;
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
@@ -14,9 +12,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   professionalSummary,
   profileImageUrl,
   backgroundImageUrl,
-  profileImageClass = 'w-40 h-40 rounded-full mx-auto mb-6 border-4 border-gray-300 shadow-xl shadow-gray-300/30',
-  backgroundImageClass = 'bg-cover bg-center',
 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 100); // trigger animation shortly after mount
+    return () => clearTimeout(timer);
+  }, []);
+
+  // common fadeInUp styles
+  const fadeInUpStyle = {
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+    transition: 'opacity 1s ease-out, transform 1s ease-out',
+  };
   return (
     <section
       className={`relative py-20 md:py-32 ${backgroundImageClass}`}
