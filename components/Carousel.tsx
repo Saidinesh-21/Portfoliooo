@@ -10,7 +10,6 @@ interface CarouselProps {
 interface CarouselSlideItemProps {
   item: MediaItem;
   itemsToShow: number;
-  isHovered: boolean;
   onHoverStart: () => void;
   onHoverEnd: () => void;
 }
@@ -18,25 +17,22 @@ interface CarouselSlideItemProps {
 const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
   item,
   itemsToShow,
-  isHovered,
   onHoverStart,
   onHoverEnd,
 }) => {
   return (
     <div
-      className="relative h-full flex-shrink-0"
+      className="relative h-full flex-shrink-0 cursor-pointer"
       style={{ width: `calc(100% / ${itemsToShow})` }}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
+      onTouchStart={onHoverStart}
+      onTouchEnd={onHoverEnd}
+      onTouchCancel={onHoverEnd}
       role="group"
       aria-roledescription="slide"
     >
-      <div
-        className={`w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out cursor-pointer ${
-          isHovered ? 'scale-110 translate-x-[-15%] z-20' : 'z-10'
-        }`}
-        style={{ transformOrigin: 'center left' }}
-      >
+      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
         <MediaRenderer mediaItem={item} className="w-full h-full object-cover rounded-md" />
       </div>
     </div>
@@ -44,15 +40,16 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 };
 
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const startHoverTimer = (index: number) => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredIndex(index);
-    }, 1000); // 1 second delay before hover effect
+    }, 1000);
   };
 
   const cancelHoverTimer = () => {
@@ -94,12 +91,35 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const canGoNext = currentIndex < media.length - itemsToShow;
 
   return (
-    <div className="relative w-full flex">
-      {/* Carousel Slides + Description Container */}
+    <>
+      {/* Left-side fixed preview */}
+      {hoveredIndex !== null && (
+        <div
+          className="fixed top-20 left-4 z-[9999] flex max-w-[600px] max-h-[80vh] bg-[#22223b]/95 rounded-lg shadow-lg p-4"
+          onMouseLeave={cancelHoverTimer}
+          onTouchEnd={cancelHoverTimer}
+          onTouchCancel={cancelHoverTimer}
+        >
+          <div className="flex-shrink-0 max-w-[300px] max-h-[80vh]">
+            <MediaRenderer
+              mediaItem={media[hoveredIndex]}
+              className="max-w-full max-h-[80vh] object-contain rounded-md"
+            />
+          </div>
+          {media[hoveredIndex].description && (
+            <div className="ml-4 text-[#f2e9e4] font-['Roboto Mono'] flex-grow flex items-center">
+              <p>{media[hoveredIndex].description}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Carousel */}
       <div
-        className="relative w-3/4 aspect-[16/9] overflow-hidden select-none"
+        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
+        onMouseLeave={cancelHoverTimer}
       >
         <div
           className="flex h-full transition-transform duration-500 ease-in-out"
@@ -110,14 +130,12 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               key={item.src + index}
               item={item}
               itemsToShow={itemsToShow}
-              isHovered={hoveredIndex === index}
               onHoverStart={() => startHoverTimer(index)}
               onHoverEnd={cancelHoverTimer}
             />
           ))}
         </div>
 
-        {/* Carousel navigation */}
         {media.length > itemsToShow && (
           <>
             <button
@@ -139,16 +157,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
           </>
         )}
       </div>
-
-      {/* Description panel on right */}
-      <div className="w-1/4 pl-6 flex items-center">
-        {hoveredIndex !== null && media[hoveredIndex]?.description && (
-          <div className="bg-[#22223b]/90 p-4 rounded-md font-['Roboto Mono'] text-[#f2e9e4] shadow-lg max-w-xs">
-            {media[hoveredIndex].description}
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 
