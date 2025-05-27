@@ -95,20 +95,20 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       {/* Left-side fixed preview */}
       {hoveredIndex !== null && (
         <div
-          className="fixed top-20 left-4 z-[9999] flex max-w-[600px] max-h-[80vh] bg-[#22223b]/95 rounded-lg shadow-lg p-4"
+          className="fixed top-1/2 left-4 z-[9999] flex max-w-[600px] max-h-[90vh] flex-col bg-[#22223b]/95 rounded-lg shadow-lg p-4 transform -translate-y-1/2"
           onMouseLeave={cancelHoverTimer}
           onTouchEnd={cancelHoverTimer}
           onTouchCancel={cancelHoverTimer}
         >
-          <div className="flex-shrink-0 max-w-[300px] max-h-[80vh]">
+          <div className="flex-shrink-0 max-w-[600px] max-h-[70vh]">
             <MediaRenderer
               mediaItem={media[hoveredIndex]}
-              className="max-w-full max-h-[80vh] object-contain rounded-md"
+              className="max-w-full max-h-[70vh] object-contain rounded-md"
             />
           </div>
           {media[hoveredIndex].description && (
-            <div className="ml-4 text-[#f2e9e4] font-['Roboto Mono'] flex-grow flex items-center">
-              <p>{media[hoveredIndex].description}</p>
+            <div className="mt-4 text-[#f2e9e4] font-['Roboto Mono'] text-center">
+              {media[hoveredIndex].description}
             </div>
           )}
         </div>
