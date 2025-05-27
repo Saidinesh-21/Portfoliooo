@@ -111,8 +111,8 @@ const App: React.FC = () => {
         <HeroSection
           name="Vamshi Mailaram"
           professionalSummary="Passionate visual storyteller, capturing moments and crafting narratives through photography and videography."
-          profileImageUrl="https://picsum.photos/seed/vamshi_profile/200/200"
-          backgroundImageUrl="https://picsum.photos/seed/vamshi_profile/200/200"
+          profileImageUrl="https://i.postimg.cc/mZ5sCwt2/IMG-5147-Original-Original.jpg"
+          backgroundImageUrl="https://i.postimg.cc/1zGmKNb7/IMG-7447-2-Original-Original.jpg"
 
         />
         <Timeline events={sampleTimelineData} />
