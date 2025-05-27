@@ -32,7 +32,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       role="group"
       aria-roledescription="slide"
     >
-      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
+      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 filter grayscale hover:grayscale-0">
         <MediaRenderer mediaItem={item} className="w-full h-full object-cover rounded-md" />
       </div>
     </div>
@@ -83,7 +83,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   if (!media || media.length === 0) {
     return (
-      <p className="text-[#c9ada7] p-4 text-center font-['Roboto Mono']">No media to display.</p>
+      <p className="text-gray-500 p-4 text-center font-['Roboto Mono']">No media to display.</p>
     );
   }
 
@@ -92,15 +92,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Centered modal preview with blurred background */}
+      {/* Centered modal preview with black-white gradient style */}
       {hoveredIndex !== null && (
         <div
-          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] bg-gradient-to-b from-black via-gray-800 to-white bg-opacity-90 backdrop-blur-sm flex items-center justify-center p-4"
           onMouseLeave={cancelHoverTimer}
           onTouchEnd={cancelHoverTimer}
           onTouchCancel={cancelHoverTimer}
         >
-          <div className="bg-[#22223b]/95 rounded-lg shadow-lg p-6 max-w-[600px] max-h-[90vh] flex flex-col items-center">
+          <div className="bg-white bg-opacity-90 rounded-lg shadow-lg p-6 max-w-[600px] max-h-[90vh] flex flex-col items-center border border-gray-300">
             <div className="flex-shrink-0 max-w-full max-h-[70vh]">
               <MediaRenderer
                 mediaItem={media[hoveredIndex]}
@@ -108,7 +108,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               />
             </div>
             {media[hoveredIndex].description && (
-              <div className="mt-4 text-[#f2e9e4] font-['Roboto Mono'] text-center max-w-[90%]">
+              <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%]">
                 {media[hoveredIndex].description}
               </div>
             )}
@@ -118,7 +118,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
       {/* Carousel */}
       <div
-        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
+        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none bg-gradient-to-b from-black via-gray-900 to-gray-300"
         role="region"
         aria-label="Media carousel"
         onMouseLeave={cancelHoverTimer}
@@ -143,7 +143,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
             <button
               onClick={goToPrevious}
               disabled={!canGoPrev}
-              className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 text-[#f2e9e4] p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 hover:bg-[#4a4e69]/70 focus:bg-[#4a4e69]/70 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#9a8c98] z-30 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 text-gray-900 bg-gray-200 p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 hover:bg-gray-300 focus:bg-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-400 z-30 disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Previous group of slides"
             >
               <ChevronLeftIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -151,7 +151,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
             <button
               onClick={goToNext}
               disabled={!canGoNext}
-              className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 text-[#f2e9e4] p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 hover:bg-[#4a4e69]/70 focus:bg-[#4a4e69]/70 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#9a8c98] z-30 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 text-gray-900 bg-gray-200 p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 hover:bg-gray-300 focus:bg-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-400 z-30 disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Next group of slides"
             >
               <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
