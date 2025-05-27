@@ -19,7 +19,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = React.memo(({ item, 
   const startHoldTimer = () => {
     holdTimeoutRef.current = setTimeout(() => {
       setShowPreview(true);
-    }, 1500); // 1.5 sec hold to show preview
+    }, 1500); // 1.5 seconds hold to show popup
   };
 
   const cancelHoldTimer = () => {
@@ -29,13 +29,12 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = React.memo(({ item, 
     }
   };
 
-  // Cancel timer and close preview on mouse/touch end or leave
   const handleCancel = () => {
     cancelHoldTimer();
     setShowPreview(false);
   };
 
-  // Close modal when clicking outside content
+  // Close modal if clicked outside content
   const modalRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const onClickOutside = (event: MouseEvent) => {
@@ -59,7 +58,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = React.memo(({ item, 
 
   return (
     <div
-      className="relative h-full flex-shrink-0"
+      className="relative h-full flex-shrink-0 cursor-pointer"
       style={{ width: `calc(100% / ${itemsToShow})` }}
       onMouseDown={startHoldTimer}
       onMouseUp={handleCancel}
@@ -70,15 +69,16 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = React.memo(({ item, 
       role="group"
       aria-roledescription="slide"
     >
-      <div className="w-full h-full p-0.5 sm:p-1 transition-transform duration-300 ease-in-out rounded-md cursor-pointer">
+      <div className="w-full h-full p-0.5 sm:p-1 transition-transform duration-300 ease-in-out rounded-md">
         <MediaRenderer mediaItem={item} className="w-full h-full object-cover rounded-md" />
       </div>
 
-      {/* Fullscreen Preview Modal */}
+      {/* Fullscreen preview modal for this image only */}
       {showPreview && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-90 flex items-center justify-center p-4 overflow-auto"
           style={{ WebkitOverflowScrolling: 'touch' }}
+          onClick={() => setShowPreview(false)}
         >
           <div
             ref={modalRef}
