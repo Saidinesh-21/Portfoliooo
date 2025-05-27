@@ -38,7 +38,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     >
       <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col justify-center items-center min-h-screen">
         <img
           src={profileImageUrl}
           alt="Profile"
