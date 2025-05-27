@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface HeroSectionProps {
   name: string;
@@ -20,7 +20,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 100);
+    const timer = setTimeout(() => setVisible(true), 100); // delay to trigger animation after mount
     return () => clearTimeout(timer);
   }, []);
 
@@ -47,14 +47,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         />
         <h1
           id="hero-name"
-          className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading mb-4"
-          style={{ ...fadeInUpStyle(0.3), color: 'black' }}
+          className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-900 mb-4"
+          style={fadeInUpStyle(0.3)}
         >
           {name}
         </h1>
         <p
-          className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto font-['Roboto Mono']"
-          style={{ ...fadeInUpStyle(0.6), color: 'black' }}
+          className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto font-['Roboto Mono'] text-gray-900"
+          style={fadeInUpStyle(0.6)}
         >
           {professionalSummary}
         </p>

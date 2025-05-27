@@ -1,4 +1,3 @@
-import React from 'react';
 import React, { useEffect } from 'react';
 import { TimelineEventData, MediaType } from './types';
 import Header from './components/Header';
@@ -228,18 +227,19 @@ const sampleTimelineData: TimelineEventData[] = [
     ],
   },
 ];
-
 const App: React.FC = () => {
   useEffect(() => {
-    // Remove any grayscale or unwanted filters
     document.body.style.filter = 'none';
     document.documentElement.style.filter = 'none';
   }, []);
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-gradient-to-b from-white via-gray-100 to-white text-black"
-      style={{ fontFamily: "'Roboto Mono', monospace" }}
+      className="min-h-screen flex flex-col bg-gradient-to-br from-black via-gray-800 to-white text-gray-900"
+      style={{
+        fontFamily: "'Roboto Mono', monospace",
+        transition: "background-color 0.5s ease", // Smooth transition for background
+      }}
     >
       <Header />
       <main className="flex-grow">
