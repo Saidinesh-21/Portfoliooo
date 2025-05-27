@@ -47,13 +47,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         />
         <h1
           id="hero-name"
-          className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-200 mb-4"
+          className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-gray-500 mb-4"
           style={fadeInUpStyle(0.3)}
         >
           {name}
         </h1>
         <p
-          className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto font-['Roboto Mono'] text-gray-300"
+          className="text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto font-['Roboto Mono'] text-gray-500"
           style={fadeInUpStyle(0.6)}
         >
           {professionalSummary}
