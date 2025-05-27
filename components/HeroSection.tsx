@@ -24,7 +24,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       aria-labelledby="hero-name"
     >
       {/* Overlay to darken and blur background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-white/70 backdrop-blur-sm"></div> 
+      <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div> 
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <img 
