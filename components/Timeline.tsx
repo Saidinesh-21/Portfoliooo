@@ -9,9 +9,7 @@ interface TimelineProps {
 const Timeline: React.FC<TimelineProps> = ({ events }) => {
   if (!events || events.length === 0) {
     return (
-      <p className="text-center text-gray-400 py-10 font-['Roboto Mono']">
-        No events to display.
-      </p>
+      <p className="text-center text-gray-600 py-10 font-['Roboto Mono']">No events to display.</p>
     );
   }
 

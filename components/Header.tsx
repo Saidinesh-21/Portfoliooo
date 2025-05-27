@@ -6,16 +6,15 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-transparent shadow-none">
+    <header className="bg-transparent backdrop-blur-md shadow-none sticky top-0 z-40 w-full">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
             <button
               onClick={scrollToTop}
-              className="text-2xl font-bold font-heading text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors duration-300 bg-transparent"
-              aria-label="Scroll to top"
+              className="text-2xl font-bold font-heading text-gray-900 hover:text-gray-700 px-4 py-2 rounded-lg transition-colors duration-300"
             >
-              Lively Lens
+              My Portfolio
             </button>
           </div>
         </div>
