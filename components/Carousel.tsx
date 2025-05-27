@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { MediaItem } from '../types';
 import MediaRenderer from './MediaRenderer';
-import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from './icons';
+import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 
 interface CarouselProps {
   media: MediaItem[];
@@ -10,37 +10,60 @@ interface CarouselProps {
 interface CarouselSlideItemProps {
   item: MediaItem;
   itemsToShow: number;
-  onClick: () => void;
+  isHovered: boolean;
+  onHoverStart: () => void;
+  onHoverEnd: () => void;
 }
 
-const CarouselSlideItem: React.FC<CarouselSlideItemProps> = React.memo(({ item, itemsToShow, onClick }) => {
+const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
+  item,
+  itemsToShow,
+  isHovered,
+  onHoverStart,
+  onHoverEnd,
+}) => {
   return (
     <div
-      className="relative h-full flex-shrink-0 cursor-pointer"
+      className="relative h-full flex-shrink-0"
       style={{ width: `calc(100% / ${itemsToShow})` }}
-      onClick={onClick}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
       role="group"
       aria-roledescription="slide"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') onClick();
-      }}
     >
-      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
+      <div
+        className={`w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out cursor-pointer ${
+          isHovered ? 'scale-110 translate-x-[-15%] z-20' : 'z-10'
+        }`}
+        style={{ transformOrigin: 'center left' }}
+      >
         <MediaRenderer mediaItem={item} className="w-full h-full object-cover rounded-md" />
       </div>
     </div>
   );
-});
+};
 
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(3);
-  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
+  const startHoverTimer = (index: number) => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredIndex(index);
+    }, 1000); // 1 second delay before hover effect
+  };
+
+  const cancelHoverTimer = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setHoveredIndex(null);
+  };
+
+  React.useEffect(() => {
     const updateItemsToShow = () => {
       if (window.innerWidth < 640) setItemsToShow(1);
       else if (window.innerWidth < 1024) setItemsToShow(2);
@@ -51,94 +74,19 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     return () => window.removeEventListener('resize', updateItemsToShow);
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (currentIndex > Math.max(0, media.length - itemsToShow)) {
       setCurrentIndex(Math.max(0, media.length - itemsToShow));
     }
   }, [itemsToShow, media.length, currentIndex]);
 
-  const goToPrevious = useCallback(() => {
-    setCurrentIndex((prevIndex) => Math.max(0, prevIndex - 1));
-  }, []);
-
-  const goToNext = useCallback(() => {
-    setCurrentIndex((prevIndex) =>
-      Math.min(prevIndex + 1, Math.max(0, media.length - itemsToShow))
-    );
-  }, [media.length, itemsToShow]);
-
-  useEffect(() => {
-    const node = carouselRef.current;
-    if (!node || media.length <= itemsToShow) return;
-
-    const handleWheel = (event: WheelEvent) => {
-      const deltaX = event.deltaX;
-      const deltaY = event.deltaY;
-      const threshold = 15;
-      let scrolledHorizontally = false;
-
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > threshold) {
-        scrolledHorizontally = true;
-        if (deltaX > 0) goToNext();
-        else goToPrevious();
-      } else if (
-        Math.abs(deltaY) > Math.abs(deltaX) &&
-        Math.abs(deltaY) > threshold
-      ) {
-        if (Math.abs(deltaX) < threshold / 2) {
-          scrolledHorizontally = true;
-          if (deltaY > 0) goToNext();
-          else goToPrevious();
-        }
-      }
-
-      if (scrolledHorizontally) event.preventDefault();
-    };
-
-    node.addEventListener('wheel', handleWheel, { passive: false });
-    return () => {
-      node.removeEventListener('wheel', handleWheel);
-    };
-  }, [goToNext, goToPrevious, media.length, itemsToShow]);
-
-  // Modal close handlers
-  useEffect(() => {
-    const onClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        setPreviewIndex(null);
-        document.body.style.overflow = '';
-      }
-    };
-
-    const onEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setPreviewIndex(null);
-        document.body.style.overflow = '';
-      }
-    };
-
-    if (previewIndex !== null) {
-      document.addEventListener('mousedown', onClickOutside);
-      document.addEventListener('keydown', onEscape);
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.removeEventListener('mousedown', onClickOutside);
-      document.removeEventListener('keydown', onEscape);
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', onClickOutside);
-      document.removeEventListener('keydown', onEscape);
-      document.body.style.overflow = '';
-    };
-  }, [previewIndex]);
+  const goToPrevious = () => setCurrentIndex((prev) => Math.max(0, prev - 1));
+  const goToNext = () =>
+    setCurrentIndex((prev) => Math.min(prev + 1, Math.max(0, media.length - itemsToShow)));
 
   if (!media || media.length === 0) {
     return (
-      <p className="text-[#c9ada7] p-4 text-center font-['Roboto Mono']">
-        No media to display.
-      </p>
+      <p className="text-[#c9ada7] p-4 text-center font-['Roboto Mono']">No media to display.</p>
     );
   }
 
@@ -146,10 +94,10 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const canGoNext = currentIndex < media.length - itemsToShow;
 
   return (
-    <>
+    <div className="relative w-full flex">
+      {/* Carousel Slides + Description Container */}
       <div
-        ref={carouselRef}
-        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
+        className="relative w-3/4 aspect-[16/9] overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
       >
@@ -162,11 +110,14 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               key={item.src + index}
               item={item}
               itemsToShow={itemsToShow}
-              onClick={() => setPreviewIndex(index)}
+              isHovered={hoveredIndex === index}
+              onHoverStart={() => startHoverTimer(index)}
+              onHoverEnd={cancelHoverTimer}
             />
           ))}
         </div>
 
+        {/* Carousel navigation */}
         {media.length > itemsToShow && (
           <>
             <button
@@ -189,39 +140,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         )}
       </div>
 
-      {/* Fullscreen Modal */}
-      {previewIndex !== null && (
-        <div
-          className="fixed inset-0 z-[9999] bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 overflow-auto"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-          onClick={() => setPreviewIndex(null)}
-        >
-          <div
-            ref={modalRef}
-            className="relative max-w-full max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MediaRenderer
-              mediaItem={media[previewIndex]}
-              className="max-w-screen max-h-[90vh] object-contain rounded"
-              style={{ touchAction: 'auto' }}
-            />
-            <button
-              aria-label="Close preview"
-              onClick={() => setPreviewIndex(null)}
-              className="absolute top-2 right-2 text-white bg-gray-800 bg-opacity-60 rounded-full p-2 hover:bg-opacity-80 transition"
-            >
-              <CloseIcon className="w-6 h-6" />
-            </button>
-            {media[previewIndex].description && (
-              <p className="mt-4 text-white text-center font-['Roboto Mono'] max-w-md">
-                {media[previewIndex].description}
-              </p>
-            )}
+      {/* Description panel on right */}
+      <div className="w-1/4 pl-6 flex items-center">
+        {hoveredIndex !== null && media[hoveredIndex]?.description && (
+          <div className="bg-[#22223b]/90 p-4 rounded-md font-['Roboto Mono'] text-[#f2e9e4] shadow-lg max-w-xs">
+            {media[hoveredIndex].description}
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 };
 
