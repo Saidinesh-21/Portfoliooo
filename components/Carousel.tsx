@@ -92,25 +92,27 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Left-side fixed preview */}
+      {/* Centered modal preview with blurred background */}
       {hoveredIndex !== null && (
         <div
-          className="fixed top-1/2 left-4 z-[9999] flex max-w-[600px] max-h-[90vh] flex-col bg-[#22223b]/95 rounded-lg shadow-lg p-4 transform -translate-y-1/2"
+          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
           onMouseLeave={cancelHoverTimer}
           onTouchEnd={cancelHoverTimer}
           onTouchCancel={cancelHoverTimer}
         >
-          <div className="flex-shrink-0 max-w-[600px] max-h-[70vh]">
-            <MediaRenderer
-              mediaItem={media[hoveredIndex]}
-              className="max-w-full max-h-[70vh] object-contain rounded-md"
-            />
-          </div>
-          {media[hoveredIndex].description && (
-            <div className="mt-4 text-[#f2e9e4] font-['Roboto Mono'] text-center">
-              {media[hoveredIndex].description}
+          <div className="bg-[#22223b]/95 rounded-lg shadow-lg p-6 max-w-[600px] max-h-[90vh] flex flex-col items-center">
+            <div className="flex-shrink-0 max-w-full max-h-[70vh]">
+              <MediaRenderer
+                mediaItem={media[hoveredIndex]}
+                className="max-w-full max-h-[70vh] object-contain rounded-md"
+              />
             </div>
-          )}
+            {media[hoveredIndex].description && (
+              <div className="mt-4 text-[#f2e9e4] font-['Roboto Mono'] text-center max-w-[90%]">
+                {media[hoveredIndex].description}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
