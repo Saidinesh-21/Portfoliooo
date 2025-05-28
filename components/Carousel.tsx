@@ -35,7 +35,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 flex justify-center items-center">
         <MediaRenderer
           mediaItem={item}
-          className="w-full h-full object-cover rounded-md"
+          className="max-w-full max-h-full object-contain rounded-md"
         />
       </div>
     </div>
@@ -47,7 +47,9 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const hoverModalRef = useRef<HTMLDivElement>(null);
 
+  // Start hover timer to show modal after 1s
   const startHoverTimer = (index: number) => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
@@ -55,12 +57,28 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     }, 1000);
   };
 
+  // Cancel hover timer and close modal
   const cancelHoverTimer = () => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
     }
     setHoveredIndex(null);
+  };
+
+  // Prevent modal flicker by keeping it open while mouse is over modal or carousel
+  const handleModalMouseLeave = (e: React.MouseEvent) => {
+    // Check if mouse actually left modal and not entered child elements
+    if (!hoverModalRef.current?.contains(e.relatedTarget as Node)) {
+      cancelHoverTimer();
+    }
+  };
+
+  const handleCarouselMouseLeave = (e: React.MouseEvent) => {
+    // Only close modal if mouse not entering modal
+    if (!hoverModalRef.current?.contains(e.relatedTarget as Node)) {
+      cancelHoverTimer();
+    }
   };
 
   useEffect(() => {
@@ -99,14 +117,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex flex-col items-center justify-center p-6"
-          onMouseLeave={cancelHoverTimer}
+          onMouseLeave={handleModalMouseLeave}
           onTouchEnd={cancelHoverTimer}
           onTouchCancel={cancelHoverTimer}
           role="dialog"
           aria-modal="true"
           aria-label="Media preview"
+          ref={hoverModalRef}
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[80vh] flex flex-col items-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[80vh] flex flex-col items-center animate-fadeIn">
             <div className="flex-shrink-0 max-w-full max-h-[70vh]">
               <MediaRenderer
                 mediaItem={media[hoveredIndex]}
@@ -114,7 +133,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               />
             </div>
             {media[hoveredIndex].description && (
-              <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%]">
+              <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%] select-text">
                 {media[hoveredIndex].description}
               </div>
             )}
@@ -127,7 +146,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
-        onMouseLeave={cancelHoverTimer}
+        onMouseLeave={handleCarouselMouseLeave}
       >
         <div
           className="flex h-full transition-transform duration-500 ease-in-out"
