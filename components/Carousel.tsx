@@ -109,15 +109,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Modal preview for hovered item */}
+      {/* Modal preview for hovered item only */}
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
           onMouseEnter={onModalMouseEnter}
-          onMouseLeave={onModalMouseLeave}
+          onMouseLeave={() => onModalMouseLeave(hoveredIndex)}
           onTouchStart={onModalMouseEnter}
-          onTouchEnd={onModalMouseLeave}
-          onTouchCancel={onModalMouseLeave}
+          onTouchEnd={() => onModalMouseLeave(hoveredIndex)}
+          onTouchCancel={() => onModalMouseLeave(hoveredIndex)}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
