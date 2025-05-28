@@ -207,6 +207,18 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
           onTouchStart={onModalMouseEnter}
           onTouchEnd={onModalMouseLeave}
           onTouchCancel={onModalMouseLeave}
+          style={{
+            position: 'fixed',  // Position the preview on top of the carousel
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            zIndex: 9999,  // Ensure it is on top of everything
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden',
+          }}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
