@@ -22,7 +22,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 }) => {
   return (
     <div
-      className="relative h-full flex-shrink-0 flex justify-center items-center cursor-pointer"
+      className="relative h-full flex-shrink-0 cursor-pointer"
       style={{ width: `calc(100% / ${itemsToShow})` }}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
@@ -32,11 +32,8 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       role="group"
       aria-roledescription="slide"
     >
-      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 flex justify-center items-center">
-        <MediaRenderer
-          mediaItem={item}
-          className="max-w-full max-h-[280px] object-contain rounded-md"
-        />
+      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
+        <MediaRenderer mediaItem={item} className="w-full h-full object-cover rounded-md" />
       </div>
     </div>
   );
@@ -98,15 +95,12 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       {/* Centered modal preview with blurred background */}
       {hoveredIndex !== null && (
         <div
-          className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex flex-col items-center justify-center p-6"
+          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
           onMouseLeave={cancelHoverTimer}
           onTouchEnd={cancelHoverTimer}
           onTouchCancel={cancelHoverTimer}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Media preview"
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[80vh] flex flex-col items-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[600px] max-h-[90vh] flex flex-col items-center">
             <div className="flex-shrink-0 max-w-full max-h-[70vh]">
               <MediaRenderer
                 mediaItem={media[hoveredIndex]}
