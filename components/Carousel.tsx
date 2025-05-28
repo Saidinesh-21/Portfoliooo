@@ -10,13 +10,15 @@ interface CarouselProps {
 interface CarouselSlideItemProps {
   item: MediaItem;
   itemsToShow: number;
-  onHoverStart: () => void;
-  onHoverEnd: () => void;
+  index: number;
+  onHoverStart: (index: number) => void;
+  onHoverEnd: (index: number) => void;
 }
 
 const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
   item,
   itemsToShow,
+  index,
   onHoverStart,
   onHoverEnd,
 }) => {
@@ -24,11 +26,11 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
     <div
       className="relative flex-shrink-0 cursor-pointer"
       style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
-      onMouseEnter={onHoverStart}
-      onMouseLeave={onHoverEnd}
-      onTouchStart={onHoverStart}
-      onTouchEnd={onHoverEnd}
-      onTouchCancel={onHoverEnd}
+      onMouseEnter={() => onHoverStart(index)}
+      onMouseLeave={() => onHoverEnd(index)}
+      onTouchStart={() => onHoverStart(index)}
+      onTouchEnd={() => onHoverEnd(index)}
+      onTouchCancel={() => onHoverEnd(index)}
       role="group"
       aria-roledescription="slide"
     >
@@ -42,45 +44,37 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Use refs to track close timeout per hovered item
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const startHoverTimer = (index: number) => {
+  const onHoverStart = (index: number) => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    hoverTimeoutRef.current = setTimeout(() => {
-      setHoveredIndex(index);
-    }, 1000);
+    setHoveredIndex(index);
   };
 
-  const cancelHoverTimer = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
+  const onHoverEnd = (index: number) => {
+    // Start timeout to close modal after short delay (avoid flicker)
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-
-    // Add small delay before closing
     closeTimeoutRef.current = setTimeout(() => {
-      setHoveredIndex(null);
+      // Only close if still hovering this index
+      setHoveredIndex((current) => (current === index ? null : current));
       closeTimeoutRef.current = null;
     }, 200);
   };
 
-  // Wrap both thumbnail and modal hover areas to avoid flicker
-  const handleModalMouseEnter = () => {
+  const onModalMouseEnter = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
   };
 
-  const handleModalMouseLeave = () => {
-    cancelHoverTimer();
+  const onModalMouseLeave = (index: number) => {
+    onHoverEnd(index);
   };
 
   useEffect(() => {
@@ -115,15 +109,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Modal preview with blurred background */}
+      {/* Modal preview for hovered item only */}
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
-          onMouseEnter={handleModalMouseEnter}
-          onMouseLeave={handleModalMouseLeave}
-          onTouchStart={handleModalMouseEnter}
-          onTouchEnd={handleModalMouseLeave}
-          onTouchCancel={handleModalMouseLeave}
+          onMouseEnter={onModalMouseEnter}
+          onMouseLeave={() => onModalMouseLeave(hoveredIndex)}
+          onTouchStart={onModalMouseEnter}
+          onTouchEnd={() => onModalMouseLeave(hoveredIndex)}
+          onTouchCancel={() => onModalMouseLeave(hoveredIndex)}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
@@ -156,8 +150,9 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               key={item.src + index}
               item={item}
               itemsToShow={itemsToShow}
-              onHoverStart={() => startHoverTimer(index)}
-              onHoverEnd={cancelHoverTimer}
+              index={index}
+              onHoverStart={onHoverStart}
+              onHoverEnd={onHoverEnd}
             />
           ))}
         </div>
