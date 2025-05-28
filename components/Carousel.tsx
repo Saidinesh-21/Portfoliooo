@@ -31,6 +31,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       onTouchStart={() => onHoverStart(index)}
       onTouchEnd={() => onHoverEnd(index)}
       onTouchCancel={() => onHoverEnd(index)}
+      onClick={() => onHoverStart(index)}  // Add click event for hover effect
       role="group"
       aria-roledescription="slide"
     >
