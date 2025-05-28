@@ -24,7 +24,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 }) => (
   <div
     className="relative flex-shrink-0 cursor-pointer"
-    style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
+    style={{ width: calc(100% / ${itemsToShow}), height: '100%' }}
     onMouseEnter={() => onHoverStart(index)}
     onMouseLeave={() => onHoverEnd(index)}
     onTouchStart={() => onHoverStart(index)}
@@ -208,40 +208,44 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                   closeTimerRef.current = null;
                 }
               }}
-              onMouseLeave={() => {
-                closeTimerRef.current = setTimeout(() => {
-                  setHoveredIndex(null);
-                  currentHoverIndexRef.current = null;
-                  closeTimerRef.current = null;
-                }, 200);
-              }}
               onTouchStart={() => {
                 if (closeTimerRef.current) {
                   clearTimeout(closeTimerRef.current);
                   closeTimerRef.current = null;
                 }
               }}
-              onTouchEnd={() => {
-                closeTimerRef.current = setTimeout(() => {
-                  setHoveredIndex(null);
-                  currentHoverIndexRef.current = null;
-                  closeTimerRef.current = null;
-                }, 200);
-              }}
-              onTouchCancel={() => {
-                closeTimerRef.current = setTimeout(() => {
-                  setHoveredIndex(null);
-                  currentHoverIndexRef.current = null;
-                  closeTimerRef.current = null;
-                }, 200);
-              }}
             >
-              {/* White framed box containing image + description */}
               <div
                 id="modal-content"
                 className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-auto"
+                onMouseLeave={() => {
+                  closeTimerRef.current = setTimeout(() => {
+                    setHoveredIndex(null);
+                    currentHoverIndexRef.current = null;
+                    closeTimerRef.current = null;
+                  }, 200);
+                }}
+                onMouseEnter={() => {
+                  if (closeTimerRef.current) {
+                    clearTimeout(closeTimerRef.current);
+                    closeTimerRef.current = null;
+                  }
+                }}
+                onTouchEnd={() => {
+                  closeTimerRef.current = setTimeout(() => {
+                    setHoveredIndex(null);
+                    currentHoverIndexRef.current = null;
+                    closeTimerRef.current = null;
+                  }, 200);
+                }}
+                onTouchCancel={() => {
+                  closeTimerRef.current = setTimeout(() => {
+                    setHoveredIndex(null);
+                    currentHoverIndexRef.current = null;
+                    closeTimerRef.current = null;
+                  }, 200);
+                }}
               >
-                {/* Image container */}
                 <div className="flex-shrink-0 max-w-full max-h-[76vh] border border-white rounded-md overflow-hidden">
                   <MediaRenderer
                     mediaItem={media[hoveredIndex]}
@@ -256,7 +260,6 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                   />
                 </div>
 
-                {/* Description below inside the white frame */}
                 {media[hoveredIndex].description && (
                   <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
                     {media[hoveredIndex].description}
@@ -276,7 +279,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       >
         <div
           className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
-          style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
+          style={{ transform: translateX(-${currentIndex * (100 / itemsToShow)}%) }}
         >
           {media.map((item, index) => (
             <CarouselSlideItem
