@@ -28,7 +28,7 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
       style={{ boxSizing: 'border-box' }}
     >
       <div className="relative">
-        {/* Vertical timeline line */}
+        {/* Vertical timelmine line */}
         <div
           className="absolute w-1 bg-[#9a8c98] rounded-full top-0 bottom-0 left-[40px]"
           aria-hidden="true"
