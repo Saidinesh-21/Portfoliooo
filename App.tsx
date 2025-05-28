@@ -70,7 +70,7 @@ const sampleTimelineData: TimelineEventData[] = [
     ],
   },
   {
-  id: 'event-client-dslr',
+    id: 'event-client-dslr',
     date: '2021-2022',
     title: 'First Client Project & DSLR Upgrade',
     category: 'Professional Growth',
@@ -227,11 +227,12 @@ const sampleTimelineData: TimelineEventData[] = [
     ],
   },
 ];
+
 const App: React.FC = () => {
   return (
     <div
       className="min-h-screen flex flex-col bg-gradient-to-b from-black via-gray-800 to-white text-gray-900"
-      style={{ fontFamily: "'Averia Serif Libre', monospace" }}
+      style={{ fontFamily: "'Averia Serif Libre', cursive" }}
     >
       <Header />
       <main className="flex-grow">
