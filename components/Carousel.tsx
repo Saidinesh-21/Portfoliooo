@@ -52,8 +52,9 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const scrollDirectionRef = useRef(1); // 1 for right, -1 for left
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const isMouseMovingRef = useRef<boolean>(false);  // Track mouse movement state
 
-  // Hover handlers with idle and close timers (same as before)
+  // Hover handlers with idle and close timers
   const onHoverStart = (index: number) => {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
@@ -63,10 +64,14 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       clearTimeout(idleTimerRef.current);
       idleTimerRef.current = null;
     }
-    currentHoverIndexRef.current = index;
-    idleTimerRef.current = setTimeout(() => {
-      setHoveredIndex(index);
-    }, 1250);
+
+    // Start idle timer only if the mouse has stopped moving
+    if (!isMouseMovingRef.current) {
+      currentHoverIndexRef.current = index;
+      idleTimerRef.current = setTimeout(() => {
+        setHoveredIndex(index);
+      }, 1250);  // Adjust time as needed
+    }
   };
 
   const onHoverEnd = (index: number) => {
@@ -96,6 +101,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         closeTimerRef.current = null;
       }, 200);
     }
+  };
+
+  // Track mouse movement state to reset idle timer on movement
+  const onMouseMove = () => {
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+    isMouseMovingRef.current = true;
   };
 
   // Responsive items to show
@@ -213,6 +227,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
+        onMouseMove={onMouseMove}  // Add mouse move listener to track movement
       >
         <div
           className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
