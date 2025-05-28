@@ -34,11 +34,11 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
           aria-hidden="true"
         />
 
-        {/* All timeline cards stacked vertically, slide with translateY */}
-        <div className="overflow-hidden h-[600px]"> {/* Adjust height as needed */}
+        {/* Visible area with fixed height */}
+        <div className="overflow-hidden h-[600px]">
           <div
             className="transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateY(-${currentIndex * 600}px)` }} 
+            style={{ transform: `translateY(-${currentIndex * 600}px)` }}
           >
             {events.map((event) => (
               <div key={event.id} className="mb-10" style={{ height: 600 }}>
@@ -48,7 +48,7 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
           </div>
         </div>
 
-        {/* Navigation buttons */}
+        {/* Navigation */}
         <div className="flex justify-center gap-4 mt-6">
           <button
             onClick={goToPrevious}

@@ -10,7 +10,7 @@ interface TimelineCardProps {
 const TimelineCard: React.FC<TimelineCardProps> = ({ event, dotOffsetFromCardEdgePx }) => {
   return (
     <div className="relative flex items-start gap-6">
-      {/* Dot and line connector */}
+      {/* Dot and vertical connector line */}
       <div
         className="absolute left-0 top-0 w-[2px] bg-[#9a8c98]"
         style={{ height: '100%', left: dotOffsetFromCardEdgePx }}
@@ -21,12 +21,13 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ event, dotOffsetFromCardEdg
         aria-hidden="true"
       />
 
+      {/* Event content */}
       <div className="ml-12 max-w-xl">
         <h3 className="text-xl font-semibold font-heading mb-1">{event.title}</h3>
         <p className="text-sm text-gray-500 mb-2">{event.date}</p>
         <p className="text-gray-700 font-['Roboto Mono'] mb-4 whitespace-pre-wrap">{event.description}</p>
 
-        {/* Carousel for event media */}
+        {/* Carousel component for event media */}
         <Carousel media={event.media} eventName={event.title} />
       </div>
     </div>
