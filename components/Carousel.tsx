@@ -246,7 +246,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                   }, 200);
                 }}
               >
-                <div className="flex-shrink-0 max-w-full max-h-[76vh] border border-white rounded-md overflow-hidden">
+                <div className="flex-shrink-0 max-w-full max-h-[500px] border border-white rounded-md overflow-hidden">
                   <MediaRenderer
                     mediaItem={media[hoveredIndex]}
                     className="object-contain rounded-md"
