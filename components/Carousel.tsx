@@ -41,62 +41,10 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
-  const hoverTimeouts = useRef<{ [key: number]: NodeJS.Timeout | null }>({});
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  // Track hover states for individual thumbnails and modals
-  const isHoveringThumbnail = useRef<{ [key: number]: boolean }>({});
-  const isHoveringModal = useRef<{ [key: number]: boolean }>({});
-
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const startHoverTimer = (index: number) => {
-    // Mark this thumbnail as hovered
-    isHoveringThumbnail.current[index] = true;
-
-    // Clear any previous timeout for this index
-    if (hoverTimeouts.current[index]) {
-      clearTimeout(hoverTimeouts.current[index]!);
-    }
-    hoverTimeouts.current[index] = setTimeout(() => {
-      setHoveredIndex(index);
-      hoverTimeouts.current[index] = null;
-    }, 750);
-  };
-
-  const onThumbnailLeave = (index: number) => {
-    isHoveringThumbnail.current[index] = false;
-
-    setTimeout(() => {
-      // Close modal for this index only if neither modal nor thumbnail is hovered
-      if (!isHoveringThumbnail.current[index] && !isHoveringModal.current[index]) {
-        if (hoverTimeouts.current[index]) {
-          clearTimeout(hoverTimeouts.current[index]!);
-          hoverTimeouts.current[index] = null;
-        }
-        if (hoveredIndex === index) setHoveredIndex(null);
-      }
-    }, 100);
-  };
-
-  const onModalEnter = (index: number) => {
-    isHoveringModal.current[index] = true;
-  };
-
-  const onModalLeave = (index: number) => {
-    isHoveringModal.current[index] = false;
-
-    setTimeout(() => {
-      if (!isHoveringThumbnail.current[index] && !isHoveringModal.current[index]) {
-        if (hoverTimeouts.current[index]) {
-          clearTimeout(hoverTimeouts.current[index]!);
-          hoverTimeouts.current[index] = null;
-        }
-        if (hoveredIndex === index) setHoveredIndex(null);
-      }
-    }, 100);
-  };
-
+  // Adjust itemsToShow based on window width
   useEffect(() => {
     const updateItemsToShow = () => {
       if (window.innerWidth < 640) setItemsToShow(1);
@@ -129,17 +77,13 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Centered modal preview with blurred background */}
+      {/* Modal preview with blurred background - Only for hovered media item */}
       {hoveredIndex !== null && (
         <div
-          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
-          onMouseEnter={() => onModalEnter(hoveredIndex)}
-          onMouseLeave={() => onModalLeave(hoveredIndex)}
-          onTouchStart={() => onModalEnter(hoveredIndex)}
-          onTouchEnd={() => onModalLeave(hoveredIndex)}
-          onTouchCancel={() => onModalLeave(hoveredIndex)}
-          aria-modal="true"
-          role="dialog"
+          className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
+          onMouseLeave={() => setHoveredIndex(null)}
+          onTouchEnd={() => setHoveredIndex(null)}
+          onTouchCancel={() => setHoveredIndex(null)}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
@@ -157,7 +101,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         </div>
       )}
 
-      {/* Carousel */}
+      {/* Carousel container */}
       <div
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
@@ -172,8 +116,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               key={item.src + index}
               item={item}
               itemsToShow={itemsToShow}
-              onHoverStart={() => startHoverTimer(index)}
-              onHoverEnd={() => onThumbnailLeave(index)}
+              onHoverStart={() => setHoveredIndex(index)}
+              onHoverEnd={() => setHoveredIndex(null)}
             />
           ))}
         </div>
