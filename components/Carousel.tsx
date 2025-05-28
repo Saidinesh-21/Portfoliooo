@@ -44,35 +44,90 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastMousePositionRef = useRef<{ x: number; y: number } | null>(null);
+  const currentHoverIndexRef = useRef<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Called when mouse enters a media item: start idle timer
   const onHoverStart = (index: number) => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-    setHoveredIndex(index);
+    clearIdleTimer();
+    currentHoverIndexRef.current = index;
+    startIdleTimer(index);
   };
 
+  // Called when mouse leaves a media item: clear hover immediately
   const onHoverEnd = (index: number) => {
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => {
-      setHoveredIndex((current) => (current === index ? null : current));
-      closeTimeoutRef.current = null;
-    }, 200);
+    clearIdleTimer();
+    if (hoveredIndex === index) {
+      setHoveredIndex(null);
+    }
+    currentHoverIndexRef.current = null;
   };
 
-  const onModalMouseEnter = () => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
+  // Starts the 1250 ms idle timer to set hover
+  const startIdleTimer = (index: number) => {
+    idleTimerRef.current = setTimeout(() => {
+      setHoveredIndex(index);
+    }, 1250);
+  };
+
+  // Clears the idle timer
+  const clearIdleTimer = () => {
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
     }
   };
 
-  const onModalMouseLeave = (index: number) => {
-    onHoverEnd(index);
+  // Reset idle timer on mouse move, only if mouse inside hovered media
+  const handleMouseMove = (e: MouseEvent) => {
+    if (hoveredIndex === null) return; // No hovered image modal open, no need to track
+
+    const pos = { x: e.clientX, y: e.clientY };
+
+    // If position changed since last time, reset timer
+    if (
+      !lastMousePositionRef.current ||
+      lastMousePositionRef.current.x !== pos.x ||
+      lastMousePositionRef.current.y !== pos.y
+    ) {
+      lastMousePositionRef.current = pos;
+
+      // Restart idle timer to delay hover close
+      clearIdleTimer();
+      idleTimerRef.current = setTimeout(() => {
+        setHoveredIndex(null);
+        currentHoverIndexRef.current = null;
+      }, 1250);
+    }
   };
+
+  // On modal mouse enter, clear close timer to keep modal open
+  const onModalMouseEnter = () => {
+    clearIdleTimer();
+  };
+
+  // On modal mouse leave, start idle timer to close after delay
+  const onModalMouseLeave = () => {
+    clearIdleTimer();
+    idleTimerRef.current = setTimeout(() => {
+      setHoveredIndex(null);
+      currentHoverIndexRef.current = null;
+    }, 1250);
+  };
+
+  // Setup window mousemove listener to track mouse movement and reset timer
+  useEffect(() => {
+    if (hoveredIndex !== null) {
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        clearIdleTimer();
+        lastMousePositionRef.current = null;
+      };
+    }
+  }, [hoveredIndex]);
 
   useEffect(() => {
     const updateItemsToShow = () => {
@@ -111,10 +166,10 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
           onMouseEnter={onModalMouseEnter}
-          onMouseLeave={() => onModalMouseLeave(hoveredIndex)}
+          onMouseLeave={onModalMouseLeave}
           onTouchStart={onModalMouseEnter}
-          onTouchEnd={() => onModalMouseLeave(hoveredIndex)}
-          onTouchCancel={() => onModalMouseLeave(hoveredIndex)}
+          onTouchEnd={onModalMouseLeave}
+          onTouchCancel={onModalMouseLeave}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
