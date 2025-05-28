@@ -155,7 +155,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     if (isScrollingRef.current) {
       const scrollTimeout = setTimeout(() => {
         isScrollingRef.current = false;  // Reset scrolling state after 300ms
-      }, 300);
+      }, 1300);
 
       return () => clearTimeout(scrollTimeout);  // Clear timeout on unmount or when scrolling stops
     }
