@@ -43,22 +43,56 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // To track if mouse is inside modal or thumbnail
+  const isHoveringThumbnail = useRef(false);
+  const isHoveringModal = useRef(false);
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Start hover timer on thumbnail enter
   const startHoverTimer = (index: number) => {
+    isHoveringThumbnail.current = true;
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredIndex(index);
       hoverTimeoutRef.current = null;
-    }, 1000);
+    }, 750);
   };
 
-  const cancelHoverTimer = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
-    setHoveredIndex(null);
+  // Called when mouse leaves thumbnail
+  const onThumbnailLeave = () => {
+    isHoveringThumbnail.current = false;
+    setTimeout(() => {
+      // Close modal only if mouse is NOT inside modal either
+      if (!isHoveringModal.current) {
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+          hoverTimeoutRef.current = null;
+        }
+        setHoveredIndex(null);
+      }
+    }, 100); // slight delay to avoid flickering
+  };
+
+  // Called when mouse enters modal
+  const onModalEnter = () => {
+    isHoveringModal.current = true;
+  };
+
+  // Called when mouse leaves modal
+  const onModalLeave = () => {
+    isHoveringModal.current = false;
+    setTimeout(() => {
+      // Close modal only if mouse is NOT inside thumbnail either
+      if (!isHoveringThumbnail.current) {
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+          hoverTimeoutRef.current = null;
+        }
+        setHoveredIndex(null);
+      }
+    }, 100); // slight delay to avoid flickering
   };
 
   useEffect(() => {
@@ -96,11 +130,16 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       {/* Centered modal preview with blurred background */}
       {hoveredIndex !== null && (
         <div
-          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 pointer-events-none"
+          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
+          onMouseEnter={onModalEnter}
+          onMouseLeave={onModalLeave}
+          onTouchStart={onModalEnter}
+          onTouchEnd={onModalLeave}
+          onTouchCancel={onModalLeave}
           aria-modal="true"
           role="dialog"
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center pointer-events-auto transition-all duration-500 ease-in-out">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
               <MediaRenderer
                 mediaItem={media[hoveredIndex]}
@@ -132,7 +171,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               item={item}
               itemsToShow={itemsToShow}
               onHoverStart={() => startHoverTimer(index)}
-              onHoverEnd={() => cancelHoverTimer()}
+              onHoverEnd={onThumbnailLeave}
             />
           ))}
         </div>
