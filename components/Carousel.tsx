@@ -210,8 +210,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
           mediaItem={media[hoveredIndex]}
           className="object-contain rounded-md"
           style={{
-            maxWidth: '100%',
-            maxHeight: '100%',
+            maxWidth: '70%',
+            maxHeight: '70%',
             height: 'auto',
             width: 'auto',
           }}
