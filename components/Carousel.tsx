@@ -3,15 +3,8 @@ import ReactDOM from 'react-dom';
 import { MediaItem } from '../types';
 import MediaRenderer from './MediaRenderer';
 
-interface BeforeAfterItem {
-  beforeSrc: string;
-  afterSrc: string;
-  description?: string;
-}
-
 interface CarouselProps {
-  media: MediaItem[] | BeforeAfterItem[];
-  eventName?: string; // to detect special timeline
+  media: MediaItem[];
 }
 
 interface CarouselSlideItemProps {
@@ -50,49 +43,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
   </div>
 );
 
-const BeforeAfterSlide: React.FC<{
-  item: BeforeAfterItem;
-  itemsToShow: number;
-  index: number;
-}> = ({ item, itemsToShow, index }) => {
-  const [showAfter, setShowAfter] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShowAfter((prev) => !prev);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div
-      className="relative flex-shrink-0 cursor-pointer"
-      style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
-      role="group"
-      aria-roledescription="slide"
-      aria-label={`Slide ${index + 1}`}
-    >
-      <div className="relative h-full w-full rounded-md overflow-hidden">
-        <img
-          src={item.beforeSrc}
-          alt="Before edit"
-          className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
-          style={{ opacity: showAfter ? 0 : 1 }}
-          draggable={false}
-        />
-        <img
-          src={item.afterSrc}
-          alt="After edit"
-          className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
-          style={{ opacity: showAfter ? 1 : 0 }}
-          draggable={false}
-        />
-      </div>
-    </div>
-  );
-};
-
-const Carousel: React.FC<CarouselProps> = ({ media, eventName }) => {
+const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -242,8 +193,6 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName }) => {
     );
   }
 
-  const isBeforeAfterTimeline = eventName === "Mastering Lightroom & Photoshop (Before & After)";
-
   return (
     <>
       {hoveredIndex !== null && modalRoot
@@ -259,90 +208,59 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName }) => {
                   closeTimerRef.current = null;
                 }
               }}
+              onMouseLeave={() => {
+                closeTimerRef.current = setTimeout(() => {
+                  setHoveredIndex(null);
+                  currentHoverIndexRef.current = null;
+                  closeTimerRef.current = null;
+                }, 200);
+              }}
               onTouchStart={() => {
                 if (closeTimerRef.current) {
                   clearTimeout(closeTimerRef.current);
                   closeTimerRef.current = null;
                 }
               }}
+              onTouchEnd={() => {
+                closeTimerRef.current = setTimeout(() => {
+                  setHoveredIndex(null);
+                  currentHoverIndexRef.current = null;
+                  closeTimerRef.current = null;
+                }, 200);
+              }}
+              onTouchCancel={() => {
+                closeTimerRef.current = setTimeout(() => {
+                  setHoveredIndex(null);
+                  currentHoverIndexRef.current = null;
+                  closeTimerRef.current = null;
+                }, 200);
+              }}
             >
+              {/* White framed box containing image + description */}
               <div
                 id="modal-content"
                 className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-auto"
-                onMouseLeave={() => {
-                  closeTimerRef.current = setTimeout(() => {
-                    setHoveredIndex(null);
-                    currentHoverIndexRef.current = null;
-                    closeTimerRef.current = null;
-                  }, 200);
-                }}
-                onMouseEnter={() => {
-                  if (closeTimerRef.current) {
-                    clearTimeout(closeTimerRef.current);
-                    closeTimerRef.current = null;
-                  }
-                }}
-                onTouchEnd={() => {
-                  closeTimerRef.current = setTimeout(() => {
-                    setHoveredIndex(null);
-                    currentHoverIndexRef.current = null;
-                    closeTimerRef.current = null;
-                  }, 200);
-                }}
-                onTouchCancel={() => {
-                  closeTimerRef.current = setTimeout(() => {
-                    setHoveredIndex(null);
-                    currentHoverIndexRef.current = null;
-                    closeTimerRef.current = null;
-                  }, 200);
-                }}
               >
-                {isBeforeAfterTimeline ? (
-                  <>
-                    <div className="flex-shrink-0 max-w-full h-[500px] border border-white rounded-md overflow-hidden relative">
-                      <img
-                        src={(media[hoveredIndex] as BeforeAfterItem).beforeSrc}
-                        alt="Before"
-                        className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
-                        style={{ opacity: 1 }}
-                        draggable={false}
-                      />
-                      <img
-                        src={(media[hoveredIndex] as BeforeAfterItem).afterSrc}
-                        alt="After"
-                        className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
-                        style={{ opacity: 1 }}
-                        draggable={false}
-                      />
-                    </div>
-                    {(media[hoveredIndex] as BeforeAfterItem).description && (
-                      <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
-                        {(media[hoveredIndex] as BeforeAfterItem).description}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="flex-shrink-0 max-w-full max-h-[76vh] border border-white rounded-md overflow-hidden">
-                      <MediaRenderer
-                        mediaItem={media[hoveredIndex] as MediaItem}
-                        className="object-contain rounded-md"
-                        style={{
-                          maxWidth: '100%',
-                          maxHeight: '100%',
-                          height: 'auto',
-                          width: 'auto',
-                          display: 'block',
-                        }}
-                      />
-                    </div>
+                {/* Image container */}
+                <div className="flex-shrink-0 max-w-full max-h-[76vh] border border-white rounded-md overflow-hidden">
+                  <MediaRenderer
+                    mediaItem={media[hoveredIndex]}
+                    className="object-contain rounded-md"
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      height: 'auto',
+                      width: 'auto',
+                      display: 'block',
+                    }}
+                  />
+                </div>
 
-                    {(media[hoveredIndex] as MediaItem).description && (
-                      <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
-                        {(media[hoveredIndex] as MediaItem).description}
-                      </div>
-                    )}
-                  </>
+                {/* Description below inside the white frame */}
+                {media[hoveredIndex].description && (
+                  <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
+                    {media[hoveredIndex].description}
+                  </div>
                 )}
               </div>
             </div>,
@@ -360,25 +278,16 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName }) => {
           className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
           style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
         >
-          {isBeforeAfterTimeline
-            ? (media as BeforeAfterItem[]).map((item, index) => (
-                <BeforeAfterSlide
-                  key={`${item.beforeSrc}-${index}`}
-                  item={item}
-                  itemsToShow={itemsToShow}
-                  index={index}
-                />
-              ))
-            : (media as MediaItem[]).map((item, index) => (
-                <CarouselSlideItem
-                  key={item.src + index}
-                  item={item}
-                  itemsToShow={itemsToShow}
-                  index={index}
-                  onHoverStart={onHoverStart}
-                  onHoverEnd={onHoverEnd}
-                />
-              ))}
+          {media.map((item, index) => (
+            <CarouselSlideItem
+              key={item.src + index}
+              item={item}
+              itemsToShow={itemsToShow}
+              index={index}
+              onHoverStart={onHoverStart}
+              onHoverEnd={onHoverEnd}
+            />
+          ))}
         </div>
       </div>
     </>
