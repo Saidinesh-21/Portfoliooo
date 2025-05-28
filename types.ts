@@ -1,16 +1,15 @@
-
 export enum MediaType {
   Image = 'IMAGE',
   YouTubeVideo = 'YOUTUBE_VIDEO',
-  InstagramReel = 'INSTAGRAM_REEL', // Represented as a generic video
+  InstagramReel = 'INSTAGRAM_REEL',
   GenericVideo = 'GENERIC_VIDEO',
 }
 
 export interface MediaItem {
   type: MediaType;
-  src: string; 
+  src: string;
   altText?: string;
-  description?: string; // Added for pop-out description in carousel
+  description?: string;
 }
 
 export interface TimelineEventData {
@@ -19,6 +18,6 @@ export interface TimelineEventData {
   title: string;
   category: string;
   description: string;
-  eventProfileImageUrl: string; // Added: URL for small profile image for this event
+  eventProfileImageUrl: string;
   media: MediaItem[];
 }

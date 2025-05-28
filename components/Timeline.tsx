@@ -8,9 +8,7 @@ interface TimelineProps {
 
 const Timeline: React.FC<TimelineProps> = ({ events }) => {
   if (!events || events.length === 0) {
-    return (
-      <p className="text-center text-gray-600 py-10 font-['Roboto Mono']">No events to display.</p>
-    );
+    return <p className="text-center text-[#c9ada7] py-10 font-['Roboto Mono']">No events to display.</p>;
   }
 
   const linePositionPx = 20;
@@ -20,7 +18,7 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
     <div className="container mx-auto px-4 py-8 sm:py-12">
       <div className="relative">
         <div
-          className="absolute w-1 bg-gray-400 top-0 bottom-0 rounded-full"
+          className="absolute w-1 bg-[#9a8c98] top-0 bottom-0 rounded-full"
           style={{ left: `${linePositionPx}px` }}
           aria-hidden="true"
         ></div>

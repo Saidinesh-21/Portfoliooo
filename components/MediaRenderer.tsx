@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { MediaItem, MediaType } from '../types';
 
 interface MediaRendererProps {
   mediaItem: MediaItem;
-  className?: string; // Base className for the wrapper/media element itself
+  className?: string;
 }
 
 const MediaRenderer: React.FC<MediaRendererProps> = React.memo(({ mediaItem, className = "" }) => {
@@ -14,7 +13,7 @@ const MediaRenderer: React.FC<MediaRendererProps> = React.memo(({ mediaItem, cla
         <img
           src={mediaItem.src}
           alt={mediaItem.altText || 'Portfolio image'}
-          className={`w-full h-full object-cover ${className}`} // Use object-cover to fill and crop
+          className={`w-full h-full object-cover ${className}`}
           loading="lazy"
         />
       );
@@ -26,16 +25,16 @@ const MediaRenderer: React.FC<MediaRendererProps> = React.memo(({ mediaItem, cla
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
-          className={`w-full h-full ${className}`} // YouTube iframe should fill its container
+          className={`w-full h-full ${className}`}
         ></iframe>
       );
     case MediaType.GenericVideo:
-    case MediaType.InstagramReel: 
+    case MediaType.InstagramReel:
       return (
         <video
           src={mediaItem.src}
           controls
-          className={`w-full h-full object-cover ${className}`} // Use object-cover for generic videos
+          className={`w-full h-full object-cover ${className}`}
         >
           Your browser does not support the video tag.
         </video>

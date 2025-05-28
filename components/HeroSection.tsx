@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface HeroSectionProps {
   name: string;
@@ -20,7 +20,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 100); // delay to trigger animation after mount
+    const timer = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
@@ -38,7 +38,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     >
       <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col justify-center items-center min-h-screen">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <img
           src={profileImageUrl}
           alt="Profile"
