@@ -76,7 +76,7 @@ const App: React.FC = () => {
   return (
     <div
       className="min-h-screen flex flex-col bg-gradient-to-b from-black via-gray-800 to-white text-gray-900"
-      style={{ fontFamily: "'Roboto Mono', monospace" }}
+      style={{ fontFamily: "'Averia Serif Libre', monospace" }}
     >
       <Header />
       <main className="flex-grow">

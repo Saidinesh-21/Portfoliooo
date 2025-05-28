@@ -14,7 +14,7 @@ const Header: React.FC = () => {
               onClick={scrollToTop}
               className="text-2xl font-bold font-heading text-gray-300 px-4 py-2 rounded-lg transition-colors duration-300 hover:text-gray-100 hover:bg-gray-700"
             >
-              My Portfolio
+              Lively Lens
             </button>
           </div>
         </div>
