@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { TimelineEventData } from '../types';
 import TimelineCard from './TimelineCard';
-import Carousel from './Carousel';
 
 interface TimelineProps {
   events: TimelineEventData[];
@@ -12,7 +11,9 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
 
   if (!events || events.length === 0) {
     return (
-      <p className="text-center text-[#c9ada7] py-10 font-['Roboto Mono']">No events to display.</p>
+      <p className="text-center text-[#c9ada7] py-10 font-['Roboto Mono']">
+        No events to display.
+      </p>
     );
   }
 
@@ -20,8 +21,6 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
 
   const goToPrevious = () => setCurrentIndex((prev) => Math.max(0, prev - 1));
   const goToNext = () => setCurrentIndex((prev) => Math.min(totalEvents - 1, prev + 1));
-
-  const currentEvent = events[currentIndex];
 
   return (
     <div
@@ -33,17 +32,23 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
         <div
           className="absolute w-1 bg-[#9a8c98] rounded-full top-0 bottom-0 left-[40px]"
           aria-hidden="true"
-        ></div>
+        />
 
-        {/* Show only current event card */}
-        <div className="mb-10">
-          <TimelineCard event={currentEvent} dotOffsetFromCardEdgePx={40} />
+        {/* All timeline cards stacked vertically, slide with translateY */}
+        <div className="overflow-hidden h-[600px]"> {/* Adjust height as needed */}
+          <div
+            className="transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateY(-${currentIndex * 600}px)` }} 
+          >
+            {events.map((event) => (
+              <div key={event.id} className="mb-10" style={{ height: 600 }}>
+                <TimelineCard event={event} dotOffsetFromCardEdgePx={40} />
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Carousel for current event */}
-        <Carousel media={currentEvent.media} eventName={currentEvent.title} />
-
-        {/* Navigation */}
+        {/* Navigation buttons */}
         <div className="flex justify-center gap-4 mt-6">
           <button
             onClick={goToPrevious}
