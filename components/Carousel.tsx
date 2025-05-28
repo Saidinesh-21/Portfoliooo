@@ -25,7 +25,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
   return (
     <div
       className="relative flex-shrink-0 cursor-pointer"
-      style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
+      style={{ width: calc(100% / ${itemsToShow}), height: '100%' }}
       onMouseEnter={() => onHoverStart(index)}
       onMouseLeave={() => onHoverEnd(index)}
       onTouchStart={() => onHoverStart(index)}
@@ -44,35 +44,96 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastMousePositionRef = useRef<{ x: number; y: number } | null>(null);
+  const currentHoverIndexRef = useRef<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const onHoverStart = (index: number) => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-    setHoveredIndex(index);
+    clearCloseTimer();
+    clearIdleTimer();
+    currentHoverIndexRef.current = index;
+    startIdleTimer(index);
   };
 
   const onHoverEnd = (index: number) => {
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => {
-      setHoveredIndex((current) => (current === index ? null : current));
-      closeTimeoutRef.current = null;
-    }, 200);
+    clearIdleTimer();
+    startCloseTimer(index);
   };
 
-  const onModalMouseEnter = () => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
+  const startIdleTimer = (index: number) => {
+    idleTimerRef.current = setTimeout(() => {
+      setHoveredIndex(index);
+    }, 1250);
+  };
+
+  const clearIdleTimer = () => {
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
     }
   };
 
-  const onModalMouseLeave = (index: number) => {
-    onHoverEnd(index);
+  const startCloseTimer = (index: number) => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      setHoveredIndex((current) => (current === index ? null : current));
+      closeTimerRef.current = null;
+      currentHoverIndexRef.current = null;
+    }, 200);  // 200ms delay before closing
   };
+
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const onModalMouseEnter = () => {
+    clearCloseTimer();
+  };
+
+  const onModalMouseLeave = () => {
+    if (hoveredIndex !== null) {
+      startCloseTimer(hoveredIndex);
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (hoveredIndex === null) return;
+
+    const pos = { x: e.clientX, y: e.clientY };
+
+    if (
+      !lastMousePositionRef.current ||
+      lastMousePositionRef.current.x !== pos.x ||
+      lastMousePositionRef.current.y !== pos.y
+    ) {
+      lastMousePositionRef.current = pos;
+      clearCloseTimer();
+      clearIdleTimer();
+
+      // Restart close timer with 200ms delay to close modal after mouse stops moving
+      closeTimerRef.current = setTimeout(() => {
+        setHoveredIndex(null);
+        currentHoverIndexRef.current = null;
+      }, 200);
+    }
+  };
+
+  useEffect(() => {
+    if (hoveredIndex !== null) {
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        clearIdleTimer();
+        clearCloseTimer();
+        lastMousePositionRef.current = null;
+      };
+    }
+  }, [hoveredIndex]);
 
   useEffect(() => {
     const updateItemsToShow = () => {
@@ -111,10 +172,10 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
           onMouseEnter={onModalMouseEnter}
-          onMouseLeave={() => onModalMouseLeave(hoveredIndex)}
+          onMouseLeave={onModalMouseLeave}
           onTouchStart={onModalMouseEnter}
-          onTouchEnd={() => onModalMouseLeave(hoveredIndex)}
-          onTouchCancel={() => onModalMouseLeave(hoveredIndex)}
+          onTouchEnd={onModalMouseLeave}
+          onTouchCancel={onModalMouseLeave}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
@@ -139,8 +200,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         aria-label="Media carousel"
       >
         <div
-          className="flex h-full transition-transform duration-500 ease-in-out gap-x-4"
-          style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
+          className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
+          style={{ transform: translateX(-${currentIndex * (100 / itemsToShow)}%) }}
         >
           {media.map((item, index) => (
             <CarouselSlideItem
