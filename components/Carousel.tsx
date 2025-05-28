@@ -44,37 +44,51 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  // Use refs to track close timeout per hovered item
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverOpenTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // On hover start: clear close timer, set open timer (1s delay)
   const onHoverStart = (index: number) => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
+    if (hoverCloseTimeoutRef.current) {
+      clearTimeout(hoverCloseTimeoutRef.current);
+      hoverCloseTimeoutRef.current = null;
     }
-    setHoveredIndex(index);
+    if (hoverOpenTimeoutRef.current) {
+      clearTimeout(hoverOpenTimeoutRef.current);
+    }
+    hoverOpenTimeoutRef.current = setTimeout(() => {
+      setHoveredIndex(index);
+      hoverOpenTimeoutRef.current = null;
+    }, 1000); // 1 second delay to open hover modal
   };
 
+  // On hover end: clear open timer, set close timer (200ms delay)
   const onHoverEnd = (index: number) => {
-    // Start timeout to close modal after short delay (avoid flicker)
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => {
-      // Only close if still hovering this index
+    if (hoverOpenTimeoutRef.current) {
+      clearTimeout(hoverOpenTimeoutRef.current);
+      hoverOpenTimeoutRef.current = null;
+    }
+    if (hoverCloseTimeoutRef.current) {
+      clearTimeout(hoverCloseTimeoutRef.current);
+    }
+    hoverCloseTimeoutRef.current = setTimeout(() => {
       setHoveredIndex((current) => (current === index ? null : current));
-      closeTimeoutRef.current = null;
-    }, 200);
+      hoverCloseTimeoutRef.current = null;
+    }, 200); // 200ms delay to close hover modal
   };
 
+  // When mouse enters modal, clear close timer to keep it open
   const onModalMouseEnter = () => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
+    if (hoverCloseTimeoutRef.current) {
+      clearTimeout(hoverCloseTimeoutRef.current);
+      hoverCloseTimeoutRef.current = null;
     }
   };
 
-  const onModalMouseLeave = (index: number) => {
-    onHoverEnd(index);
+  // When mouse leaves modal, close it immediately
+  const onModalMouseLeave = () => {
+    setHoveredIndex(null);
   };
 
   useEffect(() => {
@@ -114,10 +128,10 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
           onMouseEnter={onModalMouseEnter}
-          onMouseLeave={() => onModalMouseLeave(hoveredIndex)}
+          onMouseLeave={onModalMouseLeave}
           onTouchStart={onModalMouseEnter}
-          onTouchEnd={() => onModalMouseLeave(hoveredIndex)}
-          onTouchCancel={() => onModalMouseLeave(hoveredIndex)}
+          onTouchEnd={onModalMouseLeave}
+          onTouchCancel={onModalMouseLeave}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
