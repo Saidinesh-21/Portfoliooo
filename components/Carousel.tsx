@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { MediaItem } from '../types';
 import MediaRenderer from './MediaRenderer';
 
@@ -20,26 +21,27 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
   index,
   onHoverStart,
   onHoverEnd,
-}) => {
-  return (
-    <div
-      className="relative flex-shrink-0 cursor-pointer"
-      style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
-      onMouseEnter={() => onHoverStart(index)}
-      onMouseLeave={() => onHoverEnd(index)}
-      onTouchStart={() => onHoverStart(index)}
-      onTouchEnd={() => onHoverEnd(index)}
-      onTouchCancel={() => onHoverEnd(index)}
-      onClick={() => onHoverStart(index)}  // Trigger preview on click as well
-      role="group"
-      aria-roledescription="slide"
-    >
-      <div className="flex items-center justify-center p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 h-full">
-        <MediaRenderer mediaItem={item} className="max-w-full max-h-full object-contain rounded-md" />
-      </div>
+}) => (
+  <div
+    className="relative flex-shrink-0 cursor-pointer"
+    style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
+    onMouseEnter={() => onHoverStart(index)}
+    onMouseLeave={() => onHoverEnd(index)}
+    onTouchStart={() => onHoverStart(index)}
+    onTouchEnd={() => onHoverEnd(index)}
+    onTouchCancel={() => onHoverEnd(index)}
+    onClick={() => onHoverStart(index)}
+    role="group"
+    aria-roledescription="slide"
+  >
+    <div className="flex items-center justify-center p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 h-full">
+      <MediaRenderer
+        mediaItem={item}
+        className="max-w-full max-h-full object-contain rounded-md"
+      />
     </div>
-  );
-};
+  </div>
+);
 
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
@@ -49,31 +51,26 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const currentHoverIndexRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
-  const scrollDirectionRef = useRef(1); // 1 for right, -1 for left
-  const isScrollingRef = useRef<boolean>(false);  // Track if scrolling is in progress
+  const scrollDirectionRef = useRef(1);
+  const isScrollingRef = useRef(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Hover handlers with idle and close timers
   const onHoverStart = useCallback((index: number) => {
-    if (isScrollingRef.current) return;  // Prevent starting the timer if scrolling is in progress
+    if (isScrollingRef.current) return;
 
-    // Clear previous timers
     closeTimerRef.current && clearTimeout(closeTimerRef.current);
     idleTimerRef.current && clearTimeout(idleTimerRef.current);
 
     currentHoverIndexRef.current = index;
     idleTimerRef.current = setTimeout(() => {
       setHoveredIndex(index);
-    }, 1250);  // Adjust time as needed
+    }, 1250);
   }, []);
 
   const onHoverEnd = useCallback((index: number) => {
-    // Clear idle timer on hover end
-    if (idleTimerRef.current) {
-      clearTimeout(idleTimerRef.current);
-      idleTimerRef.current = null;
-    }
+    idleTimerRef.current && clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = null;
 
     closeTimerRef.current = setTimeout(() => {
       setHoveredIndex((current) => (current === index ? null : current));
@@ -99,7 +96,6 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     }
   };
 
-  // Responsive items to show
   useEffect(() => {
     const updateItemsToShow = () => {
       if (window.innerWidth < 640) setItemsToShow(1);
@@ -111,33 +107,26 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     return () => window.removeEventListener('resize', updateItemsToShow);
   }, []);
 
-  // Adjust currentIndex if it goes beyond range
   useEffect(() => {
     if (currentIndex > Math.max(0, media.length - itemsToShow)) {
       setCurrentIndex(Math.max(0, media.length - itemsToShow));
     }
   }, [itemsToShow, media.length, currentIndex]);
 
-  // Mouse wheel horizontal scroll handler
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        // Horizontal scroll detected
         e.preventDefault();
-        isScrollingRef.current = true;  // Mark scrolling as in progress
+        isScrollingRef.current = true;
 
         let newIndex = currentIndex;
-        if (e.deltaX > 0) {
-          newIndex = Math.min(currentIndex + 1, media.length - itemsToShow);
-        } else {
-          newIndex = Math.max(currentIndex - 1, 0);
-        }
-        setCurrentIndex(newIndex);
+        if (e.deltaX > 0) newIndex = Math.min(currentIndex + 1, media.length - itemsToShow);
+        else newIndex = Math.max(currentIndex - 1, 0);
 
-        // Reset auto-scroll on user interaction
+        setCurrentIndex(newIndex);
         resetAutoScroll();
       }
     };
@@ -146,18 +135,16 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     return () => container.removeEventListener('wheel', handleWheel);
   }, [currentIndex, itemsToShow, media.length]);
 
-  // Reset isScrollingRef after a delay to allow for scrolling to stop
   useEffect(() => {
     if (isScrollingRef.current) {
       const scrollTimeout = setTimeout(() => {
-        isScrollingRef.current = false;  // Reset scrolling state after 300ms
+        isScrollingRef.current = false;
       }, 300);
 
-      return () => clearTimeout(scrollTimeout);  // Clear timeout on unmount or when scrolling stops
+      return () => clearTimeout(scrollTimeout);
     }
   }, [currentIndex]);
 
-  // Auto-scroll function
   const autoScroll = () => {
     setCurrentIndex((prev) => {
       let nextIndex = prev + scrollDirectionRef.current;
@@ -172,19 +159,19 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     });
   };
 
-  // Reset auto-scroll timer on user interaction
   const resetAutoScroll = () => {
     if (autoScrollRef.current) clearInterval(autoScrollRef.current);
     autoScrollRef.current = setInterval(autoScroll, 3000);
   };
 
-  // Start auto-scroll on mount
   useEffect(() => {
     resetAutoScroll();
     return () => {
       if (autoScrollRef.current) clearInterval(autoScrollRef.current);
     };
   }, [media.length, itemsToShow]);
+
+  const modalRoot = document.getElementById('modal-root');
 
   if (!media || media.length === 0) {
     return (
@@ -194,41 +181,40 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Modal preview for hovered item only */}
-     {hoveredIndex !== null && (
-  <div
-    className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
-    onMouseEnter={onModalMouseEnter}
-    onMouseLeave={onModalMouseLeave}
-    onTouchStart={onModalMouseEnter}
-    onTouchEnd={onModalMouseLeave}
-    onTouchCancel={onModalMouseLeave}
-  >
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
-      <div className="flex-shrink-0 max-w-full max-h-[76vh]">
-        <MediaRenderer
-          mediaItem={media[hoveredIndex]}
-          className="object-contain rounded-md"
-          style={{
-            maxWidth: '70%',
-            maxHeight: '70%',
-            height: 'auto',
-            width: 'auto',
-          }}
-        />
-      </div>
-      {media[hoveredIndex].description && (
-        <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%]">
-          {media[hoveredIndex].description}
-        </div>
-      )}
-    </div>
-  </div>
-)}
+      {hoveredIndex !== null && modalRoot
+        ? ReactDOM.createPortal(
+            <div
+              className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
+              onMouseEnter={onModalMouseEnter}
+              onMouseLeave={onModalMouseLeave}
+              onTouchStart={onModalMouseEnter}
+              onTouchEnd={onModalMouseLeave}
+              onTouchCancel={onModalMouseLeave}
+            >
+              <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
+                <div className="flex-shrink-0 max-w-full max-h-[76vh]">
+                  <MediaRenderer
+                    mediaItem={media[hoveredIndex]}
+                    className="object-contain rounded-md"
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      height: 'auto',
+                      width: 'auto',
+                    }}
+                  />
+                </div>
+                {media[hoveredIndex].description && (
+                  <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%]">
+                    {media[hoveredIndex].description}
+                  </div>
+                )}
+              </div>
+            </div>,
+            modalRoot
+          )
+        : null}
 
-
-
-      {/* Carousel container */}
       <div
         ref={containerRef}
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
