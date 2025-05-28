@@ -1,55 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vamshi Mailaram</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     html {
       scroll-behavior: smooth;
     }
     body {
-      font-family: 'Roboto Mono', monospace; /* Default body font */
-      background: #22223b; /* space-cadet */
-      color: #f2e9e4; /* isabelline: default text color */
+      font-family: 'Roboto Mono', monospace;
+      background: #22223b;
+      color: #f2e9e4;
     }
-    h1, h2, h3, .font-heading { /* Class for headings */
+    h1, h2, h3, .font-heading {
       font-family: 'Orbitron', sans-serif;
     }
-    /* Custom scrollbar for "Space Cadet" theme */
     ::-webkit-scrollbar {
       width: 10px;
     }
     ::-webkit-scrollbar-track {
-      background: #181828; /* Slightly darker than space-cadet */
+      background: #181828;
     }
     ::-webkit-scrollbar-thumb {
-      background: #9a8c98; /* rose-quartz accent */
+      background: #9a8c98;
       border-radius: 5px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #827780; /* Darker rose-quartz */
+      background: #827780;
     }
   </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre&family=Roboto+Mono&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "react-dom/": "https://esm.sh/react-dom@18.2.0/",
-    "react/": "https://esm.sh/react@18.2.0/"
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre&family=Roboto+Mono&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.2.0",
+      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+      "react-dom/": "https://esm.sh/react-dom@18.2.0/",
+      "react/": "https://esm.sh/react@18.2.0/"
+    }
   }
-}
-</script>
+  </script>
 </head>
+
 <body class="antialiased">
   <div id="root"></div>
+  <div id="modal-root"></div> <!-- IMPORTANT: modal portal target -->
+
   <script type="module" src="/index.tsx"></script>
 </body>
-</html><link rel="stylesheet" href="index.css">
-<script src="index.tsx" type="module"></script>
+</html>
