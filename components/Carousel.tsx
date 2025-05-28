@@ -22,7 +22,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 }) => {
   return (
     <div
-      className="relative h-full flex-shrink-0 flex justify-center items-center cursor-pointer"
+      className="relative h-full flex-shrink-0 cursor-pointer"
       style={{ width: `calc(100% / ${itemsToShow})` }}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
@@ -32,11 +32,11 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       role="group"
       aria-roledescription="slide"
     >
-      <div className="p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 max-w-full max-h-full">
+      {/* Centering image/video with max height and object-contain */}
+      <div className="flex justify-center items-center w-full h-full p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
         <MediaRenderer
           mediaItem={item}
-          className="object-contain max-w-full max-h-[400px] rounded-md"
-          // max height prevents excessive vertical stretch
+          className="max-w-full max-h-[400px] object-contain rounded-md"
         />
       </div>
     </div>
@@ -96,7 +96,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Modal preview */}
+      {/* Centered modal preview with blurred background */}
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
