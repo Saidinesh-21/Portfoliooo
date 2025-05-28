@@ -35,7 +35,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 flex justify-center items-center">
         <MediaRenderer
           mediaItem={item}
-          className="max-w-full max-h-[280px] object-contain rounded-md"
+          className="w-full h-full object-cover rounded-md"
         />
       </div>
     </div>
