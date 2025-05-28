@@ -204,12 +204,17 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     onTouchEnd={onModalMouseLeave}
     onTouchCancel={onModalMouseLeave}
   >
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-auto">
-      <div className="flex-shrink-0 w-auto max-h-[85vh]">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden">
+      <div className="flex-shrink-0 max-w-full max-h-[76vh]">
         <MediaRenderer
           mediaItem={media[hoveredIndex]}
           className="object-contain rounded-md"
-          style={{ maxWidth: '100%', maxHeight: '85vh', height: 'auto', width: 'auto' }}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            height: 'auto',
+            width: 'auto',
+          }}
         />
       </div>
       {media[hoveredIndex].description && (
