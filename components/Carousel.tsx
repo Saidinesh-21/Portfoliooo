@@ -44,29 +44,37 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  // Use refs to track close timeout per hovered item
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Start hover: show modal for index
   const onHoverStart = (index: number) => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
     setHoveredIndex(index);
   };
 
-  // End hover: close modal if mouse leaves both thumbnail & modal
   const onHoverEnd = (index: number) => {
-    // Only close if the hoveredIndex is this index
-    if (hoveredIndex === index) {
-      setHoveredIndex(null);
+    // Start timeout to close modal after short delay (avoid flicker)
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(() => {
+      // Only close if still hovering this index
+      setHoveredIndex((current) => (current === index ? null : current));
+      closeTimeoutRef.current = null;
+    }, 200);
+  };
+
+  const onModalMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
     }
   };
 
-  // When mouse enters modal, keep it open
-  const onModalMouseEnter = () => {
-    // Do nothing, keep open
-  };
-
-  // When mouse leaves modal, close it
-  const onModalMouseLeave = () => {
-    setHoveredIndex(null);
+  const onModalMouseLeave = (index: number) => {
+    onHoverEnd(index);
   };
 
   useEffect(() => {
