@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TimelineEventData } from '../types';
 import TimelineCard from './TimelineCard';
+import Carousel from './Carousel';
 
 interface TimelineProps {
   events: TimelineEventData[];
@@ -20,6 +21,8 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
   const goToPrevious = () => setCurrentIndex((prev) => Math.max(0, prev - 1));
   const goToNext = () => setCurrentIndex((prev) => Math.min(totalEvents - 1, prev + 1));
 
+  const currentEvent = events[currentIndex];
+
   return (
     <div
       className="container mx-auto max-w-[1024px] px-4 sm:px-6 lg:px-8 py-8 sm:py-12"
@@ -32,19 +35,13 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
           aria-hidden="true"
         ></div>
 
-        {/* One timeline card at a time */}
-        <div className="overflow-hidden">
-          <div
-            className="transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateY(-${currentIndex * 100}%)` }}
-          >
-            {events.map((event) => (
-              <div key={event.id} className="mb-10">
-                <TimelineCard event={event} dotOffsetFromCardEdgePx={40} />
-              </div>
-            ))}
-          </div>
+        {/* Show only current event card */}
+        <div className="mb-10">
+          <TimelineCard event={currentEvent} dotOffsetFromCardEdgePx={40} />
         </div>
+
+        {/* Carousel for current event */}
+        <Carousel media={currentEvent.media} eventName={currentEvent.title} />
 
         {/* Navigation */}
         <div className="flex justify-center gap-4 mt-6">
