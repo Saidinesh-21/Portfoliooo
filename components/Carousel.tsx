@@ -44,37 +44,29 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  // Use refs to track close timeout per hovered item
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Start hover: show modal for index
   const onHoverStart = (index: number) => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
     setHoveredIndex(index);
   };
 
+  // End hover: close modal if mouse leaves both thumbnail & modal
   const onHoverEnd = (index: number) => {
-    // Start timeout to close modal after short delay (avoid flicker)
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => {
-      // Only close if still hovering this index
-      setHoveredIndex((current) => (current === index ? null : current));
-      closeTimeoutRef.current = null;
-    }, 200);
-  };
-
-  const onModalMouseEnter = () => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
+    // Only close if the hoveredIndex is this index
+    if (hoveredIndex === index) {
+      setHoveredIndex(null);
     }
   };
 
-  const onModalMouseLeave = (index: number) => {
-    onHoverEnd(index);
+  // When mouse enters modal, keep it open
+  const onModalMouseEnter = () => {
+    // Do nothing, keep open
+  };
+
+  // When mouse leaves modal, close it
+  const onModalMouseLeave = () => {
+    setHoveredIndex(null);
   };
 
   useEffect(() => {
@@ -109,15 +101,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Modal preview for hovered item only */}
+      {/* Modal preview for hovered item */}
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
           onMouseEnter={onModalMouseEnter}
-          onMouseLeave={() => onModalMouseLeave(hoveredIndex)}
+          onMouseLeave={onModalMouseLeave}
           onTouchStart={onModalMouseEnter}
-          onTouchEnd={() => onModalMouseLeave(hoveredIndex)}
-          onTouchCancel={() => onModalMouseLeave(hoveredIndex)}
+          onTouchEnd={onModalMouseLeave}
+          onTouchCancel={onModalMouseLeave}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
