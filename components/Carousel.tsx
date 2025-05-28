@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MediaItem } from '../types';
 import MediaRenderer from './MediaRenderer';
-import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 
 interface CarouselProps {
   media: MediaItem[];
@@ -56,35 +55,32 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Hover handlers with idle and close timers
-  const onHoverStart = (index: number) => {
+  const onHoverStart = useCallback((index: number) => {
     if (isScrollingRef.current) return;  // Prevent starting the timer if scrolling is in progress
 
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-    if (idleTimerRef.current) {
-      clearTimeout(idleTimerRef.current);
-      idleTimerRef.current = null;
-    }
+    // Clear previous timers
+    closeTimerRef.current && clearTimeout(closeTimerRef.current);
+    idleTimerRef.current && clearTimeout(idleTimerRef.current);
 
     currentHoverIndexRef.current = index;
     idleTimerRef.current = setTimeout(() => {
       setHoveredIndex(index);
     }, 1250);  // Adjust time as needed
-  };
+  }, []);
 
-  const onHoverEnd = (index: number) => {
+  const onHoverEnd = useCallback((index: number) => {
+    // Clear idle timer on hover end
     if (idleTimerRef.current) {
       clearTimeout(idleTimerRef.current);
       idleTimerRef.current = null;
     }
+
     closeTimerRef.current = setTimeout(() => {
       setHoveredIndex((current) => (current === index ? null : current));
       closeTimerRef.current = null;
       currentHoverIndexRef.current = null;
     }, 200);
-  };
+  }, []);
 
   const onModalMouseEnter = () => {
     if (closeTimerRef.current) {
