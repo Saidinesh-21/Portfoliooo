@@ -44,6 +44,18 @@ const sampleTimelineData: TimelineEventData[] = [
         altText: 'Early Vivo shot - Portrait',
         description: 'And my first visit to the beautiful Ellora Caves.',
       },
+      {
+        type: MediaType.Image,
+        src: 'https://i.postimg.cc/T3qtNpPH/IMG-20190818-173615-01-Original.jpg',
+        altText: 'Early Vivo shot - Portrait',
+        description: 'On a Rainy day, back 2019',
+      },
+      {
+        type: MediaType.Image,
+        src: 'https://i.postimg.cc/k5LRxymr/IMG-20181230-100435-Original.jpg',
+        altText: 'Early Vivo shot - Portrait',
+        description: 'Symmetry',
+      },
     ],
   },
   {
