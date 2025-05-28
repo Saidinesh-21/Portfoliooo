@@ -43,41 +43,82 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [isInteracting, setIsInteracting] = useState(false);
 
-  // Handle hover start with 1 second delay
+  // To track last mouse position and idle timer
+  const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hoveredItemRef = useRef<number | null>(null);
+
+  // Called when user moves mouse inside carousel area
+  const handleMouseMove = (e: MouseEvent) => {
+    // If mouse position changed reset idle timer
+    if (
+      !lastMousePosRef.current ||
+      lastMousePosRef.current.x !== e.clientX ||
+      lastMousePosRef.current.y !== e.clientY
+    ) {
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = null;
+      }
+      // Start idle timer if hovering an item
+      if (hoveredItemRef.current !== null) {
+        idleTimerRef.current = setTimeout(() => {
+          setHoveredIndex(hoveredItemRef.current);
+          idleTimerRef.current = null;
+        }, 1250);
+      }
+    }
+  };
+
+  // Called when hover starts on an item
   const onHoverStart = (index: number) => {
+    hoveredItemRef.current = index;
+    // Clear any close timer
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-
-    hoverTimeoutRef.current = setTimeout(() => {
-      setHoveredIndex(index);
-      hoverTimeoutRef.current = null;
-    }, 1250);
-  };
-
-  // Handle hover end with immediate start to close after 200ms
-  const onHoverEnd = (index: number) => {
+    // Reset hover modal and idle timer
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
     }
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    // Do not show immediately, wait for idle via mousemove logic
+    setHoveredIndex(null);
+    lastMousePosRef.current = null;
+    if (carouselRef.current) {
+      carouselRef.current.addEventListener('mousemove', handleMouseMove);
+    }
+  };
 
+  // Called when hover ends on an item
+  const onHoverEnd = (index: number) => {
+    hoveredItemRef.current = null;
+    // Remove mousemove listener
+    if (carouselRef.current) {
+      carouselRef.current.removeEventListener('mousemove', handleMouseMove);
+    }
+    // Clear idle timer
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+    // Close modal after short delay to prevent flicker
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
     closeTimeoutRef.current = setTimeout(() => {
       setHoveredIndex((current) => (current === index ? null : current));
       closeTimeoutRef.current = null;
     }, 200);
   };
 
-  // Prevent modal from closing when hovered
+  // Prevent modal closing while hovering modal
   const onModalMouseEnter = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
@@ -85,11 +126,12 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     }
   };
 
+  // Close modal when leaving modal area
   const onModalMouseLeave = (index: number) => {
     onHoverEnd(index);
   };
 
-  // Update how many items to show based on window width
+  // Responsive items to show
   useEffect(() => {
     const updateItemsToShow = () => {
       if (window.innerWidth < 640) setItemsToShow(1);
@@ -101,14 +143,14 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     return () => window.removeEventListener('resize', updateItemsToShow);
   }, []);
 
-  // Ensure currentIndex is in valid range when itemsToShow changes
+  // Ensure currentIndex valid on itemsToShow change
   useEffect(() => {
     if (currentIndex > Math.max(0, media.length - itemsToShow)) {
       setCurrentIndex(Math.max(0, media.length - itemsToShow));
     }
   }, [itemsToShow, media.length, currentIndex]);
 
-  // Handle horizontal wheel scrolling
+  // Wheel horizontal scroll
   useEffect(() => {
     const node = carouselRef.current;
     if (!node) return;
@@ -139,27 +181,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     };
 
     node.addEventListener('wheel', handleWheel, { passive: false });
-
-    return () => {
-      node.removeEventListener('wheel', handleWheel);
-    };
+    return () => node.removeEventListener('wheel', handleWheel);
   }, [media.length, itemsToShow]);
-
-  // Auto-scroll every 5 seconds if not interacting
-  useEffect(() => {
-    if (isInteracting) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => {
-        const maxIndex = media.length - itemsToShow;
-        return prev >= maxIndex ? 0 : prev + 1;
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isInteracting, media.length, itemsToShow]);
-
-  // Interaction handlers for auto-scroll pause/resume
-  const onInteractionStart = () => setIsInteracting(true);
-  const onInteractionEnd = () => setIsInteracting(false);
 
   if (!media || media.length === 0) {
     return (
@@ -198,10 +221,6 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       {/* Carousel container */}
       <div
         ref={carouselRef}
-        onMouseEnter={onInteractionStart}
-        onMouseLeave={onInteractionEnd}
-        onTouchStart={onInteractionStart}
-        onTouchEnd={onInteractionEnd}
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
