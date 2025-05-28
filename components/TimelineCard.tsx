@@ -58,7 +58,7 @@ const TimelineCard: React.FC<TimelineCardProps> = React.memo(({ event, dotOffset
         </div>
 
         {media && media.length > 0 && (
-          <div className="mb-4 rounded-lg overflow-hidden border border-[#c9ada7]/50">
+          <div className="mb-4 rounded-lg overflow-hidden border border-[#c9ada7]/50 flex justify-center items-center">
             <Carousel media={media} />
           </div>
         )}
