@@ -202,10 +202,44 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
               aria-modal="true"
               role="dialog"
+              tabIndex={-1}
+              onMouseEnter={() => {
+                if (closeTimerRef.current) {
+                  clearTimeout(closeTimerRef.current);
+                  closeTimerRef.current = null;
+                }
+              }}
+              onMouseLeave={() => {
+                closeTimerRef.current = setTimeout(() => {
+                  setHoveredIndex(null);
+                  currentHoverIndexRef.current = null;
+                  closeTimerRef.current = null;
+                }, 200);
+              }}
+              onTouchStart={() => {
+                if (closeTimerRef.current) {
+                  clearTimeout(closeTimerRef.current);
+                  closeTimerRef.current = null;
+                }
+              }}
+              onTouchEnd={() => {
+                closeTimerRef.current = setTimeout(() => {
+                  setHoveredIndex(null);
+                  currentHoverIndexRef.current = null;
+                  closeTimerRef.current = null;
+                }, 200);
+              }}
+              onTouchCancel={() => {
+                closeTimerRef.current = setTimeout(() => {
+                  setHoveredIndex(null);
+                  currentHoverIndexRef.current = null;
+                  closeTimerRef.current = null;
+                }, 200);
+              }}
             >
               <div
                 id="modal-content"
-                className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-hidden"
+                className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-auto"
               >
                 <div className="flex-shrink-0 max-w-full max-h-[76vh]">
                   <MediaRenderer
@@ -220,7 +254,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                   />
                 </div>
                 {media[hoveredIndex].description && (
-                  <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%]">
+                  <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
                     {media[hoveredIndex].description}
                   </div>
                 )}
