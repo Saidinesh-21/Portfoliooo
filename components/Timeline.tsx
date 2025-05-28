@@ -22,7 +22,7 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
 
   return (
     <div
-      className="mx-auto px-6 sm:px-12 lg:px-20 xl:px-32 2xl:px-48"
+      className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-8 sm:py-12 max-w-screen-xl"
       style={{ boxSizing: 'border-box' }}
     >
       <div className="relative">
