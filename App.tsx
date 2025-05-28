@@ -128,7 +128,25 @@ const sampleTimelineData: TimelineEventData[] = [
       },
       {
         type: MediaType.Image,
+        src: 'https://i.postimg.cc/R0mSh1ZV/IMG-2615.jpg',
+        altText: 'Client Project Sample 1',
+        description: 'Shot from a local event coverage.',
+      },
+      {
+        type: MediaType.Image,
+        src: 'https://i.postimg.cc/MZgvxQVX/IMG-5644.jpg',
+        altText: 'Client Project Sample 1',
+        description: 'Shot from a local event coverage.',
+      },
+      {
+        type: MediaType.Image,
         src: 'https://i.postimg.cc/fTZbT84J/IMG-5606.jpg',
+        altText: 'New DSLR quality',
+        description: 'Testing the limits of the new DSLR.',
+      },
+      {
+        type: MediaType.Image,
+        src: 'https://i.postimg.cc/Z5Hb9BB8/IMG-20200110-142714-Original.jpg',
         altText: 'New DSLR quality',
         description: 'Testing the limits of the new DSLR.',
       },
