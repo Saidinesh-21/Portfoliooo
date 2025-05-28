@@ -118,7 +118,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
       {/* Carousel */}
       <div
-        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
+        className="relative w-full aspect-[16/9] group/carousel overflow-hidden flex justify-center items-center select-none"
         role="region"
         aria-label="Media carousel"
         onMouseLeave={cancelHoverTimer}
