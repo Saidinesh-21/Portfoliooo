@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MediaItem } from '../types';
 import MediaRenderer from './MediaRenderer';
+import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 
 interface CarouselProps {
   media: MediaItem[];
@@ -43,74 +44,36 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
-  const hoveredItemRef = useRef<number | null>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Called when user moves mouse inside carousel area
-  const handleMouseMove = (e: MouseEvent) => {
-    if (
-      !lastMousePosRef.current ||
-      lastMousePosRef.current.x !== e.clientX ||
-      lastMousePosRef.current.y !== e.clientY
-    ) {
-      // Mouse moved: reset idle timer
-      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
-      if (idleTimerRef.current) {
-        clearTimeout(idleTimerRef.current);
-        idleTimerRef.current = null;
-      }
-      // Start idle timer again if still hovering an item
-      if (hoveredItemRef.current !== null) {
-        idleTimerRef.current = setTimeout(() => {
-          setHoveredIndex(hoveredItemRef.current);
-          idleTimerRef.current = null;
-        }, 1250);
-      }
-    }
-  };
-
-  // On hover start: begin listening for mouse move and reset timers
   const onHoverStart = (index: number) => {
-    hoveredItemRef.current = index;
-    setHoveredIndex(null); // Don't show immediately
-    lastMousePosRef.current = null;
-
-    // Remove any previous timer
-    if (idleTimerRef.current) {
-      clearTimeout(idleTimerRef.current);
-      idleTimerRef.current = null;
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
     }
-
-    // Add mousemove listener
-    if (carouselRef.current) {
-      carouselRef.current.addEventListener('mousemove', handleMouseMove);
-    }
+    setHoveredIndex(index);
   };
 
-  // On hover end: clean up timers and listeners, close hover modal after delay
   const onHoverEnd = (index: number) => {
-    hoveredItemRef.current = null;
-    lastMousePosRef.current = null;
-
-    if (idleTimerRef.current) {
-      clearTimeout(idleTimerRef.current);
-      idleTimerRef.current = null;
-    }
-
-    if (carouselRef.current) {
-      carouselRef.current.removeEventListener('mousemove', handleMouseMove);
-    }
-
-    // Delay closing modal to prevent flicker
-    setTimeout(() => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(() => {
       setHoveredIndex((current) => (current === index ? null : current));
+      closeTimeoutRef.current = null;
     }, 200);
   };
 
-  // Responsive logic to set items shown
+  const onModalMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const onModalMouseLeave = (index: number) => {
+    onHoverEnd(index);
+  };
+
   useEffect(() => {
     const updateItemsToShow = () => {
       if (window.innerWidth < 640) setItemsToShow(1);
@@ -122,46 +85,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     return () => window.removeEventListener('resize', updateItemsToShow);
   }, []);
 
-  // Adjust currentIndex if needed
   useEffect(() => {
     if (currentIndex > Math.max(0, media.length - itemsToShow)) {
       setCurrentIndex(Math.max(0, media.length - itemsToShow));
     }
   }, [itemsToShow, media.length, currentIndex]);
 
-  // Wheel event for horizontal scroll
-  useEffect(() => {
-    const node = carouselRef.current;
-    if (!node) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      const threshold = 10;
-      if (Math.abs(e.deltaX) > threshold) {
-        const direction = e.deltaX > 0 ? 1 : -1;
-        setCurrentIndex((prev) => {
-          const maxIndex = media.length - itemsToShow;
-          let nextIndex = prev + direction;
-          if (nextIndex < 0) nextIndex = 0;
-          else if (nextIndex > maxIndex) nextIndex = maxIndex;
-          return nextIndex;
-        });
-        e.preventDefault();
-      } else if (e.shiftKey && Math.abs(e.deltaY) > threshold) {
-        const direction = e.deltaY > 0 ? 1 : -1;
-        setCurrentIndex((prev) => {
-          const maxIndex = media.length - itemsToShow;
-          let nextIndex = prev + direction;
-          if (nextIndex < 0) nextIndex = 0;
-          else if (nextIndex > maxIndex) nextIndex = maxIndex;
-          return nextIndex;
-        });
-        e.preventDefault();
-      }
-    };
-
-    node.addEventListener('wheel', handleWheel, { passive: false });
-    return () => node.removeEventListener('wheel', handleWheel);
-  }, [media.length, itemsToShow]);
+  const goToPrevious = () => setCurrentIndex((prev) => Math.max(0, prev - 1));
+  const goToNext = () =>
+    setCurrentIndex((prev) => Math.min(prev + 1, Math.max(0, media.length - itemsToShow)));
 
   if (!media || media.length === 0) {
     return (
@@ -169,38 +101,20 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     );
   }
 
+  const canGoPrev = currentIndex > 0;
+  const canGoNext = currentIndex < media.length - itemsToShow;
+
   return (
     <>
+      {/* Modal preview for hovered item only */}
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
-          onMouseEnter={() => {
-            if (idleTimerRef.current) {
-              clearTimeout(idleTimerRef.current);
-              idleTimerRef.current = null;
-            }
-          }}
-          onMouseLeave={() => {
-            if (hoveredIndex !== null) {
-              onHoverEnd(hoveredIndex);
-            }
-          }}
-          onTouchStart={() => {
-            if (idleTimerRef.current) {
-              clearTimeout(idleTimerRef.current);
-              idleTimerRef.current = null;
-            }
-          }}
-          onTouchEnd={() => {
-            if (hoveredIndex !== null) {
-              onHoverEnd(hoveredIndex);
-            }
-          }}
-          onTouchCancel={() => {
-            if (hoveredIndex !== null) {
-              onHoverEnd(hoveredIndex);
-            }
-          }}
+          onMouseEnter={onModalMouseEnter}
+          onMouseLeave={() => onModalMouseLeave(hoveredIndex)}
+          onTouchStart={onModalMouseEnter}
+          onTouchEnd={() => onModalMouseLeave(hoveredIndex)}
+          onTouchCancel={() => onModalMouseLeave(hoveredIndex)}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
@@ -218,14 +132,14 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         </div>
       )}
 
+      {/* Carousel container */}
       <div
-        ref={carouselRef}
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
       >
         <div
-          className="flex h-full transition-transform duration-500 ease-in-out"
+          className="flex h-full transition-transform duration-500 ease-in-out gap-x-4"
           style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
         >
           {media.map((item, index) => (
@@ -239,6 +153,27 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
             />
           ))}
         </div>
+
+        {media.length > itemsToShow && (
+          <>
+            <button
+              onClick={goToPrevious}
+              disabled={!canGoPrev}
+              className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 text-gray-300 p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 hover:bg-gray-700 focus:bg-gray-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 z-30 disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Previous group of slides"
+            >
+              <ChevronLeftIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <button
+              onClick={goToNext}
+              disabled={!canGoNext}
+              className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 text-gray-300 p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 hover:bg-gray-700 focus:bg-gray-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 z-30 disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Next group of slides"
+            >
+              <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </>
+        )}
       </div>
     </>
   );
