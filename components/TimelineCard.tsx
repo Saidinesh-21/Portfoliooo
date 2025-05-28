@@ -8,6 +8,9 @@ interface TimelineCardProps {
 }
 
 const TimelineCard: React.FC<TimelineCardProps> = ({ event, dotOffsetFromCardEdgePx }) => {
+  // Check if event is the special "Mastering Lightroom & Photoshop (Before & After)"
+  const isBeforeAfterEvent = event.title === 'Mastering Lightroom & Photoshop (Before & After)';
+
   return (
     <div className="relative flex items-start gap-6">
       {/* Dot and vertical connector line */}
@@ -27,8 +30,13 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ event, dotOffsetFromCardEdg
         <p className="text-sm text-gray-500 mb-2">{event.date}</p>
         <p className="text-gray-700 font-['Roboto Mono'] mb-4 whitespace-pre-wrap">{event.description}</p>
 
-        {/* Carousel component for event media */}
-        <Carousel media={event.media} eventName={event.title} />
+        {/* Conditional carousel render */}
+        {isBeforeAfterEvent ? (
+          // Pass flag or handle in Carousel to do before/after logic
+          <Carousel media={event.media} eventName={event.title} isBeforeAfter />
+        ) : (
+          <Carousel media={event.media} eventName={event.title} />
+        )}
       </div>
     </div>
   );

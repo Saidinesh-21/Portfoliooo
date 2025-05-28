@@ -11,7 +11,9 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
 
   if (!events || events.length === 0) {
     return (
-      <p className="text-center text-[#c9ada7] py-10 font-['Roboto Mono']">No events to display.</p>
+      <p className="text-center text-[#c9ada7] py-10 font-['Roboto Mono']">
+        No events to display.
+      </p>
     );
   }
 
@@ -30,17 +32,16 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
         <div
           className="absolute w-1 bg-[#9a8c98] rounded-full top-0 bottom-0 left-[40px]"
           aria-hidden="true"
-        ></div>
+        />
 
-        {/* One timeline card at a time */}
-        <div className="overflow-hidden">
+        {/* Visible area with fixed height */}
+        <div className="overflow-hidden h-[600px]">
           <div
             className="transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateY(-${currentIndex * 100}%)` }}
-
+            style={{ transform: `translateY(-${currentIndex * 600}px)` }}
           >
             {events.map((event) => (
-              <div key={event.id} className="mb-10">
+              <div key={event.id} className="mb-10" style={{ height: 600 }}>
                 <TimelineCard event={event} dotOffsetFromCardEdgePx={40} />
               </div>
             ))}
