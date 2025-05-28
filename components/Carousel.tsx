@@ -49,6 +49,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredIndex(index);
+      hoverTimeoutRef.current = null;
     }, 1000);
   };
 
@@ -95,12 +96,11 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       {/* Centered modal preview with blurred background */}
       {hoveredIndex !== null && (
         <div
-          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
-          onMouseLeave={cancelHoverTimer}
-          onTouchEnd={cancelHoverTimer}
-          onTouchCancel={cancelHoverTimer}
+          className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 pointer-events-none"
+          aria-modal="true"
+          role="dialog"
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center pointer-events-auto transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
               <MediaRenderer
                 mediaItem={media[hoveredIndex]}
@@ -121,7 +121,6 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
-        onMouseLeave={cancelHoverTimer}
       >
         <div
           className="flex h-full transition-transform duration-500 ease-in-out"
@@ -133,7 +132,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               item={item}
               itemsToShow={itemsToShow}
               onHoverStart={() => startHoverTimer(index)}
-              onHoverEnd={cancelHoverTimer}
+              onHoverEnd={() => cancelHoverTimer()}
             />
           ))}
         </div>
