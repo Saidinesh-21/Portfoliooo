@@ -6,11 +6,14 @@ export enum MediaType {
 }
 
 export interface MediaItem {
-  type: MediaType;
-  src: string;
+  type: 'image' | 'video' | 'beforeAfter' | string; // Add all types you use
+  src?: string;
+  beforeSrc?: string;
+  afterSrc?: string;
   altText?: string;
   description?: string;
 }
+
 
 export interface TimelineEventData {
   id: string;

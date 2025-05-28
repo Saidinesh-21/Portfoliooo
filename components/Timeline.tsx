@@ -34,14 +34,14 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
           aria-hidden="true"
         />
 
-        {/* Visible area with fixed height */}
-        <div className="overflow-hidden h-[600px]">
+        {/* Use auto height here! */}
+        <div className="overflow-hidden" style={{ minHeight: '650px' }}>
           <div
             className="transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateY(-${currentIndex * 600}px)` }}
+            style={{ transform: `translateY(-${currentIndex * 650}px)` }}
           >
             {events.map((event) => (
-              <div key={event.id} className="mb-10" style={{ height: 600 }}>
+              <div key={event.id} className="mb-10" style={{ minHeight: 650 }}>
                 <TimelineCard event={event} dotOffsetFromCardEdgePx={40} />
               </div>
             ))}
