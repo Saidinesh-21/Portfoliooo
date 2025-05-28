@@ -22,8 +22,8 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 }) => {
   return (
     <div
-      className="relative h-full flex-shrink-0 cursor-pointer"
-      style={{ width: `calc(100% / ${itemsToShow})` }}
+      className="relative flex-shrink-0 cursor-pointer"
+      style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       onTouchStart={onHoverStart}
@@ -32,8 +32,8 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       role="group"
       aria-roledescription="slide"
     >
-      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
-        <MediaRenderer mediaItem={item} className="w-full h-full object-cover rounded-md" />
+      <div className="flex items-center justify-center p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 h-full">
+        <MediaRenderer mediaItem={item} className="max-w-full max-h-full object-contain rounded-md" />
       </div>
     </div>
   );
