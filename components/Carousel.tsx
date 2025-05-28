@@ -195,42 +195,31 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   return (
     <>
       {/* Modal preview for hovered item only */}
-      {hoveredIndex !== null && (
-        <div
-          className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
-          onMouseEnter={onModalMouseEnter}
-          onMouseLeave={onModalMouseLeave}
-          onTouchStart={onModalMouseEnter}
-          onTouchEnd={onModalMouseLeave}
-          onTouchCancel={onModalMouseLeave}
-          style={{
-            position: 'fixed',  // Position the preview on top of the carousel
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            zIndex: 9999,  // Ensure it is on top of everything
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-          }}
-        >
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
-            <div className="flex-shrink-0 max-w-full max-h-[76vh]">
-              <MediaRenderer
-                mediaItem={media[hoveredIndex]}
-                className="max-w-full max-h-[76vh] object-contain rounded-md"
-              />
-            </div>
-            {media[hoveredIndex].description && (
-              <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%]">
-                {media[hoveredIndex].description}
-              </div>
-            )}
-          </div>
+     {hoveredIndex !== null && (
+  <div
+    className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
+    onMouseEnter={onModalMouseEnter}
+    onMouseLeave={onModalMouseLeave}
+    onTouchStart={onModalMouseEnter}
+    onTouchEnd={onModalMouseLeave}
+    onTouchCancel={onModalMouseLeave}
+  >
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
+      <div className="flex-shrink-0 max-w-full max-h-[76vh]">
+        <MediaRenderer
+          mediaItem={media[hoveredIndex]}
+          className="max-w-full max-h-[76vh] object-contain rounded-md"
+        />
+      </div>
+      {media[hoveredIndex].description && (
+        <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%]">
+          {media[hoveredIndex].description}
         </div>
       )}
+    </div>
+  </div>
+)}
+
 
       {/* Carousel container */}
       <div
