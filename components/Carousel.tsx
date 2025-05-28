@@ -60,7 +60,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredIndex(index);
       hoverTimeoutRef.current = null;
-    }, 1000);
+    }, 1250);
   };
 
   // Handle hover end with immediate start to close after 200ms
