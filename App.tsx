@@ -74,19 +74,19 @@ const sampleTimelineData: TimelineEventData[] = [
     media: [
       {
         type: MediaType.Image,
-        src: 'https://picsum.photos/seed/client_work1/800/600',
+        src: 'https://i.postimg.cc/SsssqsHV/BIRD-FINAL.jpg',
         altText: 'Client Project Sample 1',
         description: 'Shot from a local event coverage.',
       },
       {
         type: MediaType.Image,
-        src: 'https://picsum.photos/seed/dslr_upgrade_shot/800/600',
+        src: 'https://i.postimg.cc/fTZbT84J/IMG-5606.jpg',
         altText: 'New DSLR quality',
         description: 'Testing the limits of the new DSLR.',
       },
       {
         type: MediaType.Image,
-        src: 'https://picsum.photos/seed/client_work2/800/600',
+        src: 'https://i.postimg.cc/P5p0Gk6Z/IMG-5232-Original-Original.jpg',
         altText: 'Client Project Sample 2',
         description: 'Product photography for a small business.',
       },
