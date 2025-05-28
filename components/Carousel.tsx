@@ -50,12 +50,14 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
   const scrollDirectionRef = useRef(1); // 1 for right, -1 for left
+  const isScrollingRef = useRef<boolean>(false);  // Track if scrolling is in progress
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const isMouseMovingRef = useRef<boolean>(false);  // Track mouse movement state
 
   // Hover handlers with idle and close timers
   const onHoverStart = (index: number) => {
+    if (isScrollingRef.current) return;  // Prevent starting the timer if scrolling is in progress
+
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
@@ -65,13 +67,10 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       idleTimerRef.current = null;
     }
 
-    // Start idle timer only if the mouse has stopped moving
-    if (!isMouseMovingRef.current) {
-      currentHoverIndexRef.current = index;
-      idleTimerRef.current = setTimeout(() => {
-        setHoveredIndex(index);
-      }, 1250);  // Adjust time as needed
-    }
+    currentHoverIndexRef.current = index;
+    idleTimerRef.current = setTimeout(() => {
+      setHoveredIndex(index);
+    }, 1250);  // Adjust time as needed
   };
 
   const onHoverEnd = (index: number) => {
@@ -103,15 +102,6 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     }
   };
 
-  // Track mouse movement state to reset idle timer on movement
-  const onMouseMove = () => {
-    if (idleTimerRef.current) {
-      clearTimeout(idleTimerRef.current);
-      idleTimerRef.current = null;
-    }
-    isMouseMovingRef.current = true;
-  };
-
   // Responsive items to show
   useEffect(() => {
     const updateItemsToShow = () => {
@@ -140,6 +130,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         // Horizontal scroll detected
         e.preventDefault();
+        isScrollingRef.current = true;  // Mark scrolling as in progress
 
         let newIndex = currentIndex;
         if (e.deltaX > 0) {
@@ -157,6 +148,17 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     container.addEventListener('wheel', handleWheel, { passive: false });
     return () => container.removeEventListener('wheel', handleWheel);
   }, [currentIndex, itemsToShow, media.length]);
+
+  // Reset isScrollingRef after a delay to allow for scrolling to stop
+  useEffect(() => {
+    if (isScrollingRef.current) {
+      const scrollTimeout = setTimeout(() => {
+        isScrollingRef.current = false;  // Reset scrolling state after 300ms
+      }, 300);
+
+      return () => clearTimeout(scrollTimeout);  // Clear timeout on unmount or when scrolling stops
+    }
+  }, [currentIndex]);
 
   // Auto-scroll function
   const autoScroll = () => {
@@ -227,7 +229,6 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
-        onMouseMove={onMouseMove}  // Add mouse move listener to track movement
       >
         <div
           className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
