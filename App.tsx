@@ -3,6 +3,7 @@ import { TimelineEventData, MediaType } from './types';
 import Header from './components/Header';
 import Timeline from './components/Timeline';
 import HeroSection from './components/HeroSection';
+import Carousel from './components/Carousel';
 
 const sampleTimelineData: TimelineEventData[] = [
   {
@@ -168,28 +169,14 @@ const sampleTimelineData: TimelineEventData[] = [
     eventProfileImageUrl: 'https://picsum.photos/seed/me_editing/100/100',
     media: [
       {
-        type: MediaType.Image,
-        src: 'https://picsum.photos/seed/edit_before1/800/600',
-        altText: 'Before Editing - Landscape',
-        description: 'Original landscape shot, SOOC.',
+        beforeSrc: 'https://picsum.photos/seed/edit_before1/800/600',
+        afterSrc: 'https://picsum.photos/seed/edit_after1/800/600',
+        description: 'Original landscape shot, SOOC to after Lightroom: Enhanced colors & mood.',
       },
       {
-        type: MediaType.Image,
-        src: 'https://picsum.photos/seed/edit_after1/800/600',
-        altText: 'After Editing - Landscape',
-        description: 'After Lightroom: Enhanced colors & mood.',
-      },
-      {
-        type: MediaType.Image,
-        src: 'https://picsum.photos/seed/edit_before2/800/600',
-        altText: 'Before Editing - Portrait',
-        description: 'Raw portrait capture.',
-      },
-      {
-        type: MediaType.Image,
-        src: 'https://picsum.photos/seed/edit_after2/800/600',
-        altText: 'After Editing - Portrait',
-        description: 'Photoshop retouching and grading applied.',
+        beforeSrc: 'https://picsum.photos/seed/edit_before2/800/600',
+        afterSrc: 'https://picsum.photos/seed/edit_after2/800/600',
+        description: 'Raw portrait capture to Photoshop retouching and grading applied.',
       },
     ],
   },
@@ -304,7 +291,17 @@ const App: React.FC = () => {
           profileImageClass="object-contain w-40 h-40 rounded-full mx-auto mb-6 border-4 border-gray-300 shadow-xl shadow-gray-300/30"
           backgroundImageClass="bg-cover bg-center"
         />
-        <Timeline events={sampleTimelineData} />
+
+        {sampleTimelineData.map((timeline) => (
+          <section key={timeline.id} className="my-12 px-4 max-w-7xl mx-auto">
+            <h2 className="text-3xl font-heading mb-6 text-center">{timeline.title}</h2>
+            <p className="text-center mb-6 font-['Roboto Mono'] max-w-3xl mx-auto">{timeline.description}</p>
+            <Carousel
+              media={timeline.media}
+              eventName={timeline.title}
+            />
+          </section>
+        ))}
       </main>
       <footer className="text-center py-8 text-gray-300 text-sm font-['Roboto Mono'] bg-transparent backdrop-blur-md shadow-none">
         <p>&copy; {new Date().getFullYear()} Vamshi Mailaram. All rights reserved.</p>
