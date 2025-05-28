@@ -223,8 +223,10 @@ const sampleTimelineData: TimelineEventData[] = [
         src: 'https://picsum.photos/seed/local_culture_doc/800/600',
         altText: 'Local Culture Interaction',
         description: 'Capturing local culture for the documentary.',
+      },
+    ],
+  },
 ];
-
 const App: React.FC = () => {
   return (
     <div
