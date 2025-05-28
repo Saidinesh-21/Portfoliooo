@@ -23,7 +23,7 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
   return (
     <div
       className="relative h-full flex-shrink-0 cursor-pointer"
-      style={{ width: `calc(100% / ${itemsToShow})` }}
+      style={{ width: calc(100% / ${itemsToShow}) }}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       onTouchStart={onHoverStart}
@@ -32,12 +32,8 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       role="group"
       aria-roledescription="slide"
     >
-      {/* Centering image/video with max height and object-contain */}
-      <div className="flex justify-center items-center w-full h-full p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
-        <MediaRenderer
-          mediaItem={item}
-          className="max-w-full max-h-[400px] object-contain rounded-md"
-        />
+      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
+        <MediaRenderer mediaItem={item} className="w-full h-full object-cover rounded-md" />
       </div>
     </div>
   );
@@ -122,14 +118,14 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
       {/* Carousel */}
       <div
-        className="relative w-full aspect-[9/16] group/carousel overflow-hidden select-none"
+        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
         onMouseLeave={cancelHoverTimer}
       >
         <div
-          className="flex h-full transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
+          className="flex h-full transition-transform duration-500 ease-in-out "
+          style={{ transform: translateX(-${currentIndex * (100 / itemsToShow)}%) }}
         >
           {media.map((item, index) => (
             <CarouselSlideItem
