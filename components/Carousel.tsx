@@ -32,8 +32,12 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
       role="group"
       aria-roledescription="slide"
     >
-      <div className="w-full h-full p-0.5 sm:p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105">
-        <MediaRenderer mediaItem={item} className="max-w-full max-h-full object-contain rounded-md" />
+      <div className="p-1 rounded-md transition-transform duration-300 ease-in-out hover:scale-105 max-w-full max-h-full">
+        <MediaRenderer
+          mediaItem={item}
+          className="object-contain max-w-full max-h-[400px] rounded-md"
+          // max height prevents excessive vertical stretch
+        />
       </div>
     </div>
   );
@@ -92,7 +96,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Centered modal preview with blurred background */}
+      {/* Modal preview */}
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4"
@@ -118,7 +122,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
       {/* Carousel */}
       <div
-        className="relative w-full aspect-[16/9] group/carousel overflow-hidden flex justify-center items-center select-none"
+        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
         onMouseLeave={cancelHoverTimer}
