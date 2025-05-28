@@ -69,7 +69,19 @@ const sampleTimelineData: TimelineEventData[] = [
     media: [
       {
         type: MediaType.Image,
+        src: 'https://i.postimg.cc/Jh16tSNY/IMG-8748-Original.jpg',
+        altText: 'Early video edit with iPhone',
+        description: 'Experimenting with video on the iPhone.',
+      },
+      {
+        type: MediaType.Image,
         src: 'https://i.postimg.cc/Ls84kwyW/IMG-5598-Original.jpg',
+        altText: 'First camera photo',
+        description: 'One of my first shots with the new DSLR.',
+      },
+      {
+        type: MediaType.Image,
+        src: 'https://i.postimg.cc/6p1c5TQq/IMG-9696.avif',
         altText: 'First camera photo',
         description: 'One of my first shots with the new DSLR.',
       },
@@ -82,6 +94,18 @@ const sampleTimelineData: TimelineEventData[] = [
       {
         type: MediaType.Image,
         src: 'https://i.postimg.cc/XNch3qNw/IMG-2813-Original.jpg',
+        altText: 'iPhone A photography example',
+        description: 'Discovering the capabilities of iPhone photography.',
+      },
+      {
+        type: MediaType.Image,
+        src: 'https://i.postimg.cc/CxZD77FM/IMG-9008.avif',
+        altText: 'iPhone A photography example',
+        description: 'Discovering the capabilities of iPhone photography.',
+      },
+      {
+        type: MediaType.Image,
+        src: 'https://i.postimg.cc/1t0D6zyp/IMG-8919.avif',
         altText: 'iPhone A photography example',
         description: 'Discovering the capabilities of iPhone photography.',
       },
