@@ -28,7 +28,7 @@ const sampleTimelineData: TimelineEventData[] = [
       },
       {
         type: MediaType.Image,
-        src: 'https://picsum.photos/seed/vivo_pic3/800/600',
+        src: 'https://i.postimg.cc/Y0GwDwgX/IMG-20190704-175804-Original.jpg',
         altText: 'Early Vivo shot - Portrait',
         description: 'An early attempt at a street portrait.',
       },
