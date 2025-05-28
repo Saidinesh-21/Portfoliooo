@@ -139,7 +139,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
         aria-label="Media carousel"
       >
         <div
-          className="flex h-full transition-transform duration-500 ease-in-out gap-x-4"
+          className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
           style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
         >
           {media.map((item, index) => (
