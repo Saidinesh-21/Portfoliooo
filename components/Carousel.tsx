@@ -50,91 +50,55 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const currentHoverIndexRef = useRef<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Ref for carousel container div to implement wheel scroll & auto scroll
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+  // Scroll position tracker for auto-scroll
+  const scrollPositionRef = useRef(0);
+  const autoScrollDirectionRef = useRef(1); // 1 for right, -1 for left
+  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Hover handlers — unchanged
   const onHoverStart = (index: number) => {
-    clearCloseTimer();
-    clearIdleTimer();
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
     currentHoverIndexRef.current = index;
-    startIdleTimer(index);
-  };
-
-  const onHoverEnd = (index: number) => {
-    clearIdleTimer();
-    startCloseTimer(index);
-  };
-
-  const startIdleTimer = (index: number) => {
     idleTimerRef.current = setTimeout(() => {
       setHoveredIndex(index);
     }, 1250);
   };
 
-  const clearIdleTimer = () => {
+  const onHoverEnd = (index: number) => {
     if (idleTimerRef.current) {
       clearTimeout(idleTimerRef.current);
       idleTimerRef.current = null;
     }
-  };
-
-  const startCloseTimer = (index: number) => {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     closeTimerRef.current = setTimeout(() => {
       setHoveredIndex((current) => (current === index ? null : current));
       closeTimerRef.current = null;
       currentHoverIndexRef.current = null;
-    }, 200);  // 200ms delay before closing
+    }, 200);
   };
 
-  const clearCloseTimer = () => {
+  const onModalMouseEnter = () => {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
   };
 
-  const onModalMouseEnter = () => {
-    clearCloseTimer();
-  };
-
   const onModalMouseLeave = () => {
     if (hoveredIndex !== null) {
-      startCloseTimer(hoveredIndex);
+      onHoverEnd(hoveredIndex);
     }
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (hoveredIndex === null) return;
-
-    const pos = { x: e.clientX, y: e.clientY };
-
-    if (
-      !lastMousePositionRef.current ||
-      lastMousePositionRef.current.x !== pos.x ||
-      lastMousePositionRef.current.y !== pos.y
-    ) {
-      lastMousePositionRef.current = pos;
-      clearCloseTimer();
-      clearIdleTimer();
-
-      // Restart close timer with 200ms delay to close modal after mouse stops moving
-      closeTimerRef.current = setTimeout(() => {
-        setHoveredIndex(null);
-        currentHoverIndexRef.current = null;
-      }, 200);
-    }
-  };
-
-  useEffect(() => {
-    if (hoveredIndex !== null) {
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        clearIdleTimer();
-        clearCloseTimer();
-        lastMousePositionRef.current = null;
-      };
-    }
-  }, [hoveredIndex]);
-
+  // Responsive items to show
   useEffect(() => {
     const updateItemsToShow = () => {
       if (window.innerWidth < 640) setItemsToShow(1);
@@ -146,11 +110,102 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     return () => window.removeEventListener('resize', updateItemsToShow);
   }, []);
 
+  // Clamp currentIndex if itemsToShow or media length changes
   useEffect(() => {
     if (currentIndex > Math.max(0, media.length - itemsToShow)) {
       setCurrentIndex(Math.max(0, media.length - itemsToShow));
     }
   }, [itemsToShow, media.length, currentIndex]);
+
+  // Scroll the carousel on mouse wheel horizontally
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    // Wheel event handler for horizontal scrolling
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) > 0) {
+        e.preventDefault();
+
+        // Scroll horizontally based on wheel delta (some trackpads send deltaY for horizontal scroll)
+        const scrollAmount = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+        carousel.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth',
+        });
+
+        // Update scrollPositionRef to keep track of scroll (for auto-scroll pause)
+        scrollPositionRef.current = carousel.scrollLeft;
+
+        // Pause auto scroll on user interaction
+        if (autoScrollIntervalRef.current) {
+          clearInterval(autoScrollIntervalRef.current);
+          autoScrollIntervalRef.current = null;
+        }
+      }
+    };
+
+    carousel.addEventListener('wheel', onWheel, { passive: false });
+
+    return () => {
+      carousel.removeEventListener('wheel', onWheel);
+    };
+  }, []);
+
+  // Auto-scroll the carousel slowly when no user interaction for 3 seconds
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    let lastInteractionTime = Date.now();
+
+    const onUserInteraction = () => {
+      lastInteractionTime = Date.now();
+
+      // Clear auto scroll interval on interaction
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+        autoScrollIntervalRef.current = null;
+      }
+    };
+
+    carousel.addEventListener('wheel', onUserInteraction);
+    carousel.addEventListener('touchstart', onUserInteraction);
+    carousel.addEventListener('mousemove', onUserInteraction);
+
+    // Auto-scroll function (runs every 20 ms)
+    const autoScrollFn = () => {
+      if (!carousel) return;
+      const now = Date.now();
+
+      // If no interaction in last 3 seconds, auto-scroll
+      if (now - lastInteractionTime > 3000) {
+        const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+        if (
+          scrollPositionRef.current >= maxScrollLeft
+        ) {
+          autoScrollDirectionRef.current = -1; // Reverse direction
+        } else if (scrollPositionRef.current <= 0) {
+          autoScrollDirectionRef.current = 1; // Forward direction
+        }
+
+        scrollPositionRef.current += autoScrollDirectionRef.current * 1; // Scroll speed (1 px per tick)
+        carousel.scrollLeft = scrollPositionRef.current;
+      }
+    };
+
+    autoScrollIntervalRef.current = setInterval(autoScrollFn, 20);
+
+    return () => {
+      carousel.removeEventListener('wheel', onUserInteraction);
+      carousel.removeEventListener('touchstart', onUserInteraction);
+      carousel.removeEventListener('mousemove', onUserInteraction);
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+        autoScrollIntervalRef.current = null;
+      }
+    };
+  }, []);
 
   const goToPrevious = () => setCurrentIndex((prev) => Math.max(0, prev - 1));
   const goToNext = () =>
@@ -195,13 +250,14 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
       {/* Carousel container */}
       <div
-        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
+        ref={carouselRef}
+        className="relative w-full aspect-[16/9] group/carousel overflow-x-auto overflow-y-hidden scrollbar-hide select-none"
         role="region"
         aria-label="Media carousel"
       >
         <div
-          className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
-          style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
+          className="flex h-full gap-x-3"
+          style={{ minWidth: `${(media.length / itemsToShow) * 100}%`, scrollSnapType: 'x mandatory' }}
         >
           {media.map((item, index) => (
             <CarouselSlideItem
@@ -215,6 +271,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
           ))}
         </div>
 
+        {/* Commented out arrow buttons since user wants scrolling by wheel */}
+        {/* 
         {media.length > itemsToShow && (
           <>
             <button
@@ -234,7 +292,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </>
-        )}
+        )} 
+        */}
       </div>
     </>
   );
