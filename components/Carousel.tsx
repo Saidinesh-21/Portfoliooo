@@ -42,9 +42,47 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
 const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Adjust itemsToShow based on window width
+  const startHoverTimer = (index: number) => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredIndex(index);
+    }, 1000);
+  };
+
+  const cancelHoverTimer = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+
+    // Add small delay before closing
+    closeTimeoutRef.current = setTimeout(() => {
+      setHoveredIndex(null);
+      closeTimeoutRef.current = null;
+    }, 200);
+  };
+
+  // Wrap both thumbnail and modal hover areas to avoid flicker
+  const handleModalMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const handleModalMouseLeave = () => {
+    cancelHoverTimer();
+  };
+
   useEffect(() => {
     const updateItemsToShow = () => {
       if (window.innerWidth < 640) setItemsToShow(1);
@@ -77,13 +115,15 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
   return (
     <>
-      {/* Modal preview with blurred background - Only for hovered media item */}
+      {/* Modal preview with blurred background */}
       {hoveredIndex !== null && (
         <div
           className="fixed inset-0 z-[9999] bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4"
-          onMouseLeave={() => setHoveredIndex(null)}
-          onTouchEnd={() => setHoveredIndex(null)}
-          onTouchCancel={() => setHoveredIndex(null)}
+          onMouseEnter={handleModalMouseEnter}
+          onMouseLeave={handleModalMouseLeave}
+          onTouchStart={handleModalMouseEnter}
+          onTouchEnd={handleModalMouseLeave}
+          onTouchCancel={handleModalMouseLeave}
         >
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
             <div className="flex-shrink-0 max-w-full max-h-[76vh]">
@@ -116,8 +156,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
               key={item.src + index}
               item={item}
               itemsToShow={itemsToShow}
-              onHoverStart={() => setHoveredIndex(index)}
-              onHoverEnd={() => setHoveredIndex(null)}
+              onHoverStart={() => startHoverTimer(index)}
+              onHoverEnd={cancelHoverTimer}
             />
           ))}
         </div>
