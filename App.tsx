@@ -45,27 +45,21 @@ const sampleTimelineData: TimelineEventData[] = [
     media: [
       {
         type: MediaType.Image,
-        src: 'https://picsum.photos/seed/camera_shot1/800/600',
+        src: 'https://i.postimg.cc/Ls84kwyW/IMG-5598-Original.jpg',
         altText: 'First camera photo',
         description: 'One of my first shots with the new DSLR.',
       },
       {
         type: MediaType.GenericVideo,
-        src: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        src: 'https://i.postimg.cc/02PTJmXW/IMG-6558.avif',
         altText: 'Early video edit with iPhone',
         description: 'Experimenting with video on the iPhone.',
       },
       {
         type: MediaType.Image,
-        src: 'https://picsum.photos/seed/iphoneA_photo1/800/600',
+        src: 'https://i.postimg.cc/XNch3qNw/IMG-2813-Original.jpg',
         altText: 'iPhone A photography example',
         description: 'Discovering the capabilities of iPhone photography.',
-      },
-      {
-        type: MediaType.Image,
-        src: 'https://picsum.photos/seed/camera_shot2/800/600',
-        altText: 'Learning depth of field',
-        description: 'Practicing depth of field with the DSLR.',
       },
     ],
   },
