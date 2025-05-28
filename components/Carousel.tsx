@@ -273,7 +273,7 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 
       <div
         ref={containerRef}
-        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none px-[3in]"
+        className="relative w-full aspect-[16/9] group/carousel overflow-hidden select-none"
         role="region"
         aria-label="Media carousel"
       >
