@@ -254,9 +254,9 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                   />
                 </div>
                 {media[hoveredIndex].description && (
-                  <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
-                    {media[hoveredIndex].description}
-                  </div>
+                 <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
+  {media[hoveredIndex].description}
+</div>
                 )}
               </div>
             </div>,
