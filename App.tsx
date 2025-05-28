@@ -93,7 +93,7 @@ const sampleTimelineData = [
 const App: React.FC = () => (
   <div
     className="min-h-screen flex flex-col bg-gradient-to-b from-black via-gray-800 to-white text-gray-900"
-    style={{ fontFamily: "'Averia Serif Libre', cursive" }}
+    style={{ fontFamily: "'Magines', cursive" }}
   >
     <Header />
     <main className="flex-grow">
