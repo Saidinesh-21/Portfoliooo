@@ -45,34 +45,29 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastMousePositionRef = useRef<{ x: number; y: number } | null>(null);
   const currentHoverIndexRef = useRef<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Called when mouse enters a media item: start idle timer
   const onHoverStart = (index: number) => {
+    clearCloseTimer();
     clearIdleTimer();
     currentHoverIndexRef.current = index;
     startIdleTimer(index);
   };
 
-  // Called when mouse leaves a media item: clear hover immediately
   const onHoverEnd = (index: number) => {
     clearIdleTimer();
-    if (hoveredIndex === index) {
-      setHoveredIndex(null);
-    }
-    currentHoverIndexRef.current = null;
+    startCloseTimer(index);
   };
 
-  // Starts the 1250 ms idle timer to set hover
   const startIdleTimer = (index: number) => {
     idleTimerRef.current = setTimeout(() => {
       setHoveredIndex(index);
     }, 1250);
   };
 
-  // Clears the idle timer
   const clearIdleTimer = () => {
     if (idleTimerRef.current) {
       clearTimeout(idleTimerRef.current);
@@ -80,50 +75,61 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     }
   };
 
-  // Reset idle timer on mouse move, only if mouse inside hovered media
+  const startCloseTimer = (index: number) => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      setHoveredIndex((current) => (current === index ? null : current));
+      closeTimerRef.current = null;
+      currentHoverIndexRef.current = null;
+    }, 200);  // 200ms delay before closing
+  };
+
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const onModalMouseEnter = () => {
+    clearCloseTimer();
+  };
+
+  const onModalMouseLeave = () => {
+    if (hoveredIndex !== null) {
+      startCloseTimer(hoveredIndex);
+    }
+  };
+
   const handleMouseMove = (e: MouseEvent) => {
-    if (hoveredIndex === null) return; // No hovered image modal open, no need to track
+    if (hoveredIndex === null) return;
 
     const pos = { x: e.clientX, y: e.clientY };
 
-    // If position changed since last time, reset timer
     if (
       !lastMousePositionRef.current ||
       lastMousePositionRef.current.x !== pos.x ||
       lastMousePositionRef.current.y !== pos.y
     ) {
       lastMousePositionRef.current = pos;
-
-      // Restart idle timer to delay hover close
+      clearCloseTimer();
       clearIdleTimer();
-      idleTimerRef.current = setTimeout(() => {
+
+      // Restart close timer with 200ms delay to close modal after mouse stops moving
+      closeTimerRef.current = setTimeout(() => {
         setHoveredIndex(null);
         currentHoverIndexRef.current = null;
-      }, 1250);
+      }, 200);
     }
   };
 
-  // On modal mouse enter, clear close timer to keep modal open
-  const onModalMouseEnter = () => {
-    clearIdleTimer();
-  };
-
-  // On modal mouse leave, start idle timer to close after delay
-  const onModalMouseLeave = () => {
-    clearIdleTimer();
-    idleTimerRef.current = setTimeout(() => {
-      setHoveredIndex(null);
-      currentHoverIndexRef.current = null;
-    }, 1250);
-  };
-
-  // Setup window mousemove listener to track mouse movement and reset timer
   useEffect(() => {
     if (hoveredIndex !== null) {
       window.addEventListener('mousemove', handleMouseMove);
       return () => {
         window.removeEventListener('mousemove', handleMouseMove);
         clearIdleTimer();
+        clearCloseTimer();
         lastMousePositionRef.current = null;
       };
     }
