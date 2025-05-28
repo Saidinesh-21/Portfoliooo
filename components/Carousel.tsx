@@ -3,8 +3,15 @@ import ReactDOM from 'react-dom';
 import { MediaItem } from '../types';
 import MediaRenderer from './MediaRenderer';
 
+interface BeforeAfterItem {
+  beforeSrc: string;
+  afterSrc: string;
+  description?: string;
+}
+
 interface CarouselProps {
-  media: MediaItem[];
+  media: MediaItem[] | BeforeAfterItem[];
+  eventName?: string;
 }
 
 interface CarouselSlideItemProps {
@@ -43,7 +50,51 @@ const CarouselSlideItem: React.FC<CarouselSlideItemProps> = ({
   </div>
 );
 
-const Carousel: React.FC<CarouselProps> = ({ media }) => {
+const BeforeAfterSlide: React.FC<{
+  item: BeforeAfterItem;
+  itemsToShow: number;
+  index: number;
+}> = ({ item, itemsToShow, index }) => {
+  const [showAfter, setShowAfter] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowAfter((prev) => !prev);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div
+      className="relative flex-shrink-0 cursor-pointer"
+      style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
+      role="group"
+      aria-roledescription="slide"
+      aria-label={`Slide ${index + 1}`}
+    >
+      <div className="relative h-full w-full rounded-md overflow-hidden">
+        {/* Before Image */}
+        <img
+          src={item.beforeSrc}
+          alt="Before edit"
+          className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+          style={{ opacity: showAfter ? 0 : 1 }}
+          draggable={false}
+        />
+        {/* After Image */}
+        <img
+          src={item.afterSrc}
+          alt="After edit"
+          className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+          style={{ opacity: showAfter ? 1 : 0 }}
+          draggable={false}
+        />
+      </div>
+    </div>
+  );
+};
+
+const Carousel: React.FC<CarouselProps> = ({ media, eventName }) => {
   const [itemsToShow, setItemsToShow] = useState(3);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -193,6 +244,8 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     );
   }
 
+  const isBeforeAfterTimeline = eventName === "Mastering Lightroom & Photoshop (Before & After)";
+
   return (
     <>
       {hoveredIndex !== null && modalRoot
@@ -246,24 +299,52 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                   }, 200);
                 }}
               >
-                <div className="flex-shrink-0 max-w-full max-h-[76vh] border border-white rounded-md overflow-hidden">
-                  <MediaRenderer
-                    mediaItem={media[hoveredIndex]}
-                    className="object-contain rounded-md"
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '100%',
-                      height: 'auto',
-                      width: 'auto',
-                      display: 'block',
-                    }}
-                  />
-                </div>
+                {isBeforeAfterTimeline ? (
+                  <>
+                    <div className="flex-shrink-0 max-w-full h-[500px] border border-white rounded-md overflow-hidden relative">
+                      <img
+                        src={(media[hoveredIndex] as BeforeAfterItem).beforeSrc}
+                        alt="Before"
+                        className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+                        style={{ opacity: 1 }}
+                        draggable={false}
+                      />
+                      <img
+                        src={(media[hoveredIndex] as BeforeAfterItem).afterSrc}
+                        alt="After"
+                        className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+                        style={{ opacity: 1 }}
+                        draggable={false}
+                      />
+                    </div>
+                    {(media[hoveredIndex] as BeforeAfterItem).description && (
+                      <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
+                        {(media[hoveredIndex] as BeforeAfterItem).description}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex-shrink-0 max-w-full max-h-[76vh] border border-white rounded-md overflow-hidden">
+                      <MediaRenderer
+                        mediaItem={media[hoveredIndex]}
+                        className="object-contain rounded-md"
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          height: 'auto',
+                          width: 'auto',
+                          display: 'block',
+                        }}
+                      />
+                    </div>
 
-                {media[hoveredIndex].description && (
-                  <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
-                    {media[hoveredIndex].description}
-                  </div>
+                    {media[hoveredIndex].description && (
+                      <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
+                        {media[hoveredIndex].description}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>,
@@ -281,16 +362,25 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
           className="flex h-full transition-transform duration-500 ease-in-out gap-x-3"
           style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}
         >
-          {media.map((item, index) => (
-            <CarouselSlideItem
-              key={item.src + index}
-              item={item}
-              itemsToShow={itemsToShow}
-              index={index}
-              onHoverStart={onHoverStart}
-              onHoverEnd={onHoverEnd}
-            />
-          ))}
+          {isBeforeAfterTimeline
+            ? (media as BeforeAfterItem[]).map((item, index) => (
+                <BeforeAfterSlide
+                  key={`${item.beforeSrc}-${index}`}
+                  item={item}
+                  itemsToShow={itemsToShow}
+                  index={index}
+                />
+              ))
+            : media.map((item, index) => (
+                <CarouselSlideItem
+                  key={item.src + index}
+                  item={item}
+                  itemsToShow={itemsToShow}
+                  index={index}
+                  onHoverStart={onHoverStart}
+                  onHoverEnd={onHoverEnd}
+                />
+              ))}
         </div>
       </div>
     </>
@@ -298,3 +388,46 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
 };
 
 export default Carousel;
+
+// Helper component inside the same file for before/after slides
+const BeforeAfterSlide: React.FC<{
+  item: BeforeAfterItem;
+  itemsToShow: number;
+  index: number;
+}> = ({ item, itemsToShow, index }) => {
+  const [showAfter, setShowAfter] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowAfter((prev) => !prev);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div
+      className="relative flex-shrink-0 cursor-pointer"
+      style={{ width: `calc(100% / ${itemsToShow})`, height: '100%' }}
+      role="group"
+      aria-roledescription="slide"
+      aria-label={`Slide ${index + 1}`}
+    >
+      <div className="relative h-full w-full rounded-md overflow-hidden">
+        <img
+          src={item.beforeSrc}
+          alt="Before edit"
+          className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+          style={{ opacity: showAfter ? 0 : 1 }}
+          draggable={false}
+        />
+        <img
+          src={item.afterSrc}
+          alt="After edit"
+          className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+          style={{ opacity: showAfter ? 1 : 0 }}
+          draggable={false}
+        />
+      </div>
+    </div>
+  );
+};
