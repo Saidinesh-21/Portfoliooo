@@ -28,12 +28,11 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
       style={{ boxSizing: 'border-box' }}
     >
       <div className="relative">
-        {/* Vertical timeline lin1e */}
+        {/* Vertical timeline line */}
         <div
           className="absolute w-1 bg-[#9a8c98] rounded-full top-0 bottom-0 left-[40px]"
           aria-hidden="true"
         />
-        {/* Changed from fixed height to dynamic height */}
         <div className="overflow-hidden">
           <div
             className="transition-transform duration-500 ease-in-out"

@@ -30,7 +30,6 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName, isBeforeAfter = f
   if (isBeforeAfter) {
     const currentItem = media[currentIndex];
     if (!currentItem.beforeSrc || !currentItem.afterSrc) {
-      // fallback: show src if before/after missing
       return (
         <div>
           <MediaRenderer mediaItem={media[currentIndex]} />
@@ -60,7 +59,6 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName, isBeforeAfter = f
     );
   }
 
-  // Normal carousel for other events: show current media with description
   return (
     <div className="rounded-md overflow-hidden max-w-full h-auto">
       <MediaRenderer mediaItem={media[currentIndex]} />
