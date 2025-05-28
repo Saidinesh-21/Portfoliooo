@@ -61,7 +61,6 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
     currentHoverIndexRef.current = null;
   }, []);
 
-  // Close modal on click outside & Escape key
   useEffect(() => {
     if (hoveredIndex === null) return;
 
@@ -237,11 +236,13 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                 }, 200);
               }}
             >
+              {/* White framed box containing image + description */}
               <div
                 id="modal-content"
                 className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out overflow-auto"
               >
-                <div className="flex-shrink-0 max-w-full max-h-[76vh]">
+                {/* Image container */}
+                <div className="flex-shrink-0 max-w-full max-h-[76vh] border border-white rounded-md overflow-hidden">
                   <MediaRenderer
                     mediaItem={media[hoveredIndex]}
                     className="object-contain rounded-md"
@@ -250,13 +251,16 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
                       maxHeight: '100%',
                       height: 'auto',
                       width: 'auto',
+                      display: 'block',
                     }}
                   />
                 </div>
+
+                {/* Description below inside the white frame */}
                 {media[hoveredIndex].description && (
-                 <div className="mt-4 text-gray-900 font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
-  {media[hoveredIndex].description}
-</div>
+                  <div className="mt-4 text-black font-['Roboto Mono'] text-center max-w-[90%] whitespace-pre-wrap">
+                    {media[hoveredIndex].description}
+                  </div>
                 )}
               </div>
             </div>,
