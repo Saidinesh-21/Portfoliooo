@@ -100,11 +100,11 @@ const Carousel: React.FC<CarouselProps> = ({ media }) => {
           onTouchEnd={cancelHoverTimer}
           onTouchCancel={cancelHoverTimer}
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[600px] max-h-[90vh] flex flex-col items-center">
-            <div className="flex-shrink-0 max-w-full max-h-[70vh]">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-[80vw] max-h-[90vh] flex flex-col items-center transition-all duration-500 ease-in-out">
+            <div className="flex-shrink-0 max-w-full max-h-[85vh]">
               <MediaRenderer
                 mediaItem={media[hoveredIndex]}
-                className="max-w-full max-h-[70vh] object-contain rounded-md"
+                className="max-w-full max-h-[85vh] object-contain rounded-md"
               />
             </div>
             {media[hoveredIndex].description && (

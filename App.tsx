@@ -50,7 +50,7 @@ const sampleTimelineData: TimelineEventData[] = [
         description: 'One of my first shots with the new DSLR.',
       },
       {
-        type: MediaType.GenericVideo,
+        type: MediaType.Image,
         src: 'https://i.postimg.cc/02PTJmXW/IMG-6558.avif',
         altText: 'Early video edit with iPhone',
         description: 'Experimenting with video on the iPhone.',
