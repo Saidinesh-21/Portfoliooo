@@ -30,9 +30,15 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName, isBeforeAfter = f
   if (isBeforeAfter) {
     const currentItem = media[currentIndex];
     if (!currentItem.beforeSrc || !currentItem.afterSrc) {
+      // fallback: show src if before/after missing
       return (
         <div>
           <MediaRenderer mediaItem={media[currentIndex]} />
+          {media[currentIndex].description && (
+            <p className="mt-2 text-gray-800 font-['Roboto Mono'] text-center whitespace-pre-wrap">
+              {media[currentIndex].description}
+            </p>
+          )}
         </div>
       );
     }
@@ -43,6 +49,7 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName, isBeforeAfter = f
           src={showAfter ? currentItem.afterSrc : currentItem.beforeSrc}
           alt={showAfter ? `After - ${eventName}` : `Before - ${eventName}`}
           className="object-contain w-full h-auto rounded-md transition-opacity duration-1000 ease-in-out"
+          style={{ opacity: 1 }}
         />
         {currentItem.description && (
           <p className="mt-2 text-gray-800 font-['Roboto Mono'] text-center whitespace-pre-wrap">
@@ -53,7 +60,7 @@ const Carousel: React.FC<CarouselProps> = ({ media, eventName, isBeforeAfter = f
     );
   }
 
-  // Normal carousel: just display first image for simplicity
+  // Normal carousel for other events: show current media with description
   return (
     <div className="rounded-md overflow-hidden max-w-full h-auto">
       <MediaRenderer mediaItem={media[currentIndex]} />
