@@ -36,7 +36,7 @@ const Timeline: React.FC<TimelineProps> = ({ events }) => {
         <div className="overflow-hidden">
           <div
             className="transition-transform duration-500 ease-in-out"
-            style={{ transform: translateY(-${currentIndex * 100}%) }}
+            style={{ transform: `translateY(-${currentIndex * 100}%)` }}
           >
             {events.map((event) => (
               <div key={event.id} className="mb-10">
